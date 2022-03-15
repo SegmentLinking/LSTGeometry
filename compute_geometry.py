@@ -128,5 +128,5 @@ for index, detid in enumerate(centroid.data):
     # push to the list
     module_four_corners_database[detid] = four_corner_coords
 
-g = open("data/CMSSW_12_2_0_pre2_geom.txt", "w")
+g = open("data/geom.txt", "w")
 g.write(json.dumps(module_four_corners_database, indent=4))

@@ -16,8 +16,8 @@ def create_figure(objs, name):
                 zaxis = dict(nticks=10, range=[-300,300],),
                 aspectratio=dict(x=1, y=1, z=1),
                 ),
-            width=size,
-            height=size,
+            width=1000,
+            height=1000,
             margin=dict(r=20, l=10, b=10, t=10));
     fig.write_html(name)
 
