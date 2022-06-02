@@ -221,12 +221,16 @@ namespace SDL
             ModuleLayerType moduleLayerType_;
 
             void setDerivedQuantities();
+            void setDerivedQuantities(unsigned int moduleTypeInfo);
+            void setDerivedQuantities(ModuleType moduleType, ModuleLayerType moduleLayerType);
 
         public:
 
             // constructor/destructor
             Module();
             Module(unsigned int detId);
+            Module(unsigned int detId, unsigned int moduleTypeInfo);
+            Module(unsigned int detId, ModuleType moduleType, ModuleLayerType moduleLayerType);
             Module(const Module&);
             ~Module();
 
@@ -246,6 +250,8 @@ namespace SDL
 
             // modifying the class content
             void setDetId(unsigned int);
+            void setDetId(unsigned int, unsigned int);
+            void setDetId(unsigned int, ModuleType, ModuleLayerType);
 
             // static functions to parse detId
             static unsigned short parseSubdet(unsigned int);
@@ -276,9 +282,14 @@ SDL::Module::Module(unsigned int detId)
     setDetId(detId);
 }
 
+SDL::Module::Module(unsigned int detId, unsigned int moduleTypeInfo)
+{
+    setDetId(detId, moduleTypeInfo);
+}
+
 SDL::Module::Module(const Module& module)
 {
-    setDetId(module.detId());
+    setDetId(module.detId(), module.moduleType(), module.moduleLayerType());
 }
 
 SDL::Module::~Module()
@@ -351,6 +362,18 @@ void SDL::Module::setDetId(unsigned int detId)
     setDerivedQuantities();
 }
 
+void SDL::Module::setDetId(unsigned int detId, unsigned int moduleTypeInfo)
+{
+    detId_ = detId;
+    setDerivedQuantities(moduleTypeInfo);
+}
+
+void SDL::Module::setDetId(unsigned int detId, ModuleType moduleType, ModuleLayerType moduleLayerType)
+{
+    detId_ = detId;
+    setDerivedQuantities(moduleType, moduleLayerType);
+}
+
 void SDL::Module::setDerivedQuantities()
 {
     subdet_ = parseSubdet(detId_);
@@ -364,6 +387,36 @@ void SDL::Module::setDerivedQuantities()
     partnerDetId_ = parsePartnerDetId(detId_);
     moduleType_ = parseModuleType(detId_);
     moduleLayerType_ = parseModuleLayerType(detId_);
+}
+
+void SDL::Module::setDerivedQuantities(unsigned int moduleTypeInfo)
+{
+    subdet_ = parseSubdet(detId_);
+    side_ = parseSide(detId_);
+    layer_ = parseLayer(detId_);
+    rod_ = parseRod(detId_);
+    ring_ = parseRing(detId_);
+    module_ = parseModule(detId_);
+    isLower_ = parseIsLower(detId_);
+    isInverted_ = parseIsInverted(detId_);
+    partnerDetId_ = parsePartnerDetId(detId_);
+    moduleType_ = ( moduleTypeInfo == 25 ? SDL::Module::TwoS : SDL::Module::PS ); // 23 : Ph2PSP, 24 : Ph2PSS, 25 : Ph2SS
+    moduleLayerType_ = ( moduleTypeInfo == 23 ? SDL::Module::Pixel : SDL::Module::Strip ); // 23 : Ph2PSP, 24 : Ph2PSS, 25 : Ph2SS
+}
+
+void SDL::Module::setDerivedQuantities(ModuleType moduleType, ModuleLayerType moduleLayerType)
+{
+    subdet_ = parseSubdet(detId_);
+    side_ = parseSide(detId_);
+    layer_ = parseLayer(detId_);
+    rod_ = parseRod(detId_);
+    ring_ = parseRing(detId_);
+    module_ = parseModule(detId_);
+    isLower_ = parseIsLower(detId_);
+    isInverted_ = parseIsInverted(detId_);
+    partnerDetId_ = parsePartnerDetId(detId_);
+    moduleType_ = moduleType;
+    moduleLayerType_ = moduleLayerType;
 }
 
 unsigned short SDL::Module::parseSubdet(unsigned int detId)
