@@ -14,7 +14,7 @@ for line in tqdm.tqdm(lines):
     ls = line.split()
     detid = ls[7]
     if detid not in moduleType:
-      moduleType[detid] = ls[9]
+        moduleType[detid] = ls[9]
     hit = (float(ls[1]), float(ls[3]), float(ls[5])) # NOTE in txt file we have z, y, x coordinates 
     if detid not in hits:
         hits[detid] = []
