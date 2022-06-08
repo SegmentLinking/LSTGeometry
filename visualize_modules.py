@@ -34,7 +34,7 @@ for line in sys.stdin:
 detids = [item for sublist in rows for item in sublist]
 
 # Print the list of modules to plot that was provided by the user
-print detids
+print(detids)
 
 # Visualize the detector via drawing xy or rz projections
 sdlDisplay = LSTDisplay.getDefaultLSTDisplay()

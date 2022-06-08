@@ -9,9 +9,11 @@ r.gROOT.ProcessLine(".L {}/ModuleDetIdParser.cxx".format(dirpath))
 
 class Module:
 
-    def __init__(self, detid):
+    def __init__(self, detid, moduleTypeInfo=None):
         self.detid = int(detid)
         self.moduleSDL = r.SDL.Module(self.detid)
+        if moduleTypeInfo != None:
+            self.moduleSDL = r.SDL.Module(self.detid, int(moduleTypeInfo))
 
     maxBarrelxyModules = {1:18,2:26,3:36,4:48,5:60,6:78}
     #[layer][ring]

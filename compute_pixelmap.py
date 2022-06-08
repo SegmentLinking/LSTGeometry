@@ -4,6 +4,7 @@ import ROOT as r
 import json
 from tqdm import tqdm
 from Module import Module
+from Centroid import Centroid
 import math
 
 ptthresh = 0.8
@@ -325,6 +326,7 @@ def printPixelMap_v1():
 
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     det_geom = DetectorGeometry("/data2/segmentlinking/phase2_2020_0428.txt".format(dirpath))
+    centroid = Centroid("data/centroid.txt")
 
     super_bins = {}
 
@@ -354,7 +356,9 @@ def printPixelMap_v1():
                 bounds = super_bins[isuper_bin]
                 maps[isuper_bin] = []
                 for detid in det_geom.getDetIds():
-                    if Module(detid).layer() == layer and Module(detid).isLower() == 1 and Module(detid).moduleType() == 0 and Module(detid).subdet() == subdet:
+                    x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
+                    m =  Module(detid, moduleTypeInfo)
+                    if m.layer() == layer and m.isLower() == 1 and m.moduleType() == 0 and m.subdet() == subdet:
                         if det_geom.isConnected(detid, bounds[2], bounds[3], bounds[4], bounds[5], bounds[0], bounds[1], -30, 30):
                             maps[isuper_bin].append(detid)
                 print(isuper_bin, layer, subdet, bounds[2], bounds[3], bounds[4], bounds[5], maps[isuper_bin])
@@ -365,6 +369,7 @@ def printPixelMap_v2():
 
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     det_geom = DetectorGeometry("/data2/segmentlinking/phase2_2020_0428.txt".format(dirpath))
+    centroid = Centroid("data/centroid.txt")
 
     neta = 40.
     nphi = 72.
@@ -384,7 +389,8 @@ def printPixelMap_v2():
                         maps[(ipt, ieta, iphi, -1)][(layer, subdet)] = []
 
     for detid in tqdm(det_geom.getDetIds()):
-        module = Module(detid)
+        x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
+        module = Module(detid, moduleTypeInfo)
         layer = module.layer()
         subdet = module.subdet()
         if module.isLower() != 1 or module.moduleType() != 0:
@@ -469,6 +475,7 @@ def printPixelMap_v3():
 
     # The text file is a json file with "detid" -> {xyz of 4 corners of the module}
     det_geom = DetectorGeometry("/data2/segmentlinking/phase2_2020_0428.txt")
+    centroid = Centroid("data/centroid.txt")
 
     # Define the binning of "super bins"
     neta = 25.
@@ -513,9 +520,10 @@ def printPixelMap_v3():
 
     # Loop over the detids and for each detid compute which superbins it is connected to
     for detid in tqdm(det_geom.getDetIds()):
+        x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
 
         # Parse the layer and subdet
-        module = Module(detid)
+        module = Module(detid, moduleTypeInfo)
         layer = module.layer()
         subdet = module.subdet()
 

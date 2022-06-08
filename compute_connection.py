@@ -311,7 +311,7 @@ def write_connections(docurved=False):
             ))
             # and (Module(x[0]).layer() == 1 and Module(x[0]).rod() == 1 and Module(x[0]).isLower() == 1)
             )
-    ref_detid = list_of_detids_etaphi_layer_ref[0]
+    ref_detid = sorted(list(list_of_detids_etaphi_layer_ref))[0]
 
     njobs = 32
     manager = multiprocessing.Manager()
@@ -691,15 +691,15 @@ if __name__ == "__main__":
 #     for helix in pos_helices + [pos_helix]:
 #         res = sdlmath.helix_intersects_module(helix, bounds, centroid)
 #         if res[0]:
-#             print Module(ref_detid)
-#             print Module(detid_tar)
-#             print res[0], res[1]
+#             print(Module(ref_detid))
+#             print(Module(detid_tar))
+#             print(res[0], res[1])
 #             detids_intersect.append(detid_tar)
 #             intersecting_points.append(res[1])
 #         else:
-#             print Module(ref_detid)
-#             print Module(detid_tar)
-#             print res[0], res[1]
+#             print(Module(ref_detid))
+#             print(Module(detid_tar))
+#             print(res[0], res[1])
 # intersecting_points = np.array(intersecting_points)
 
 # print(detids_intersect)

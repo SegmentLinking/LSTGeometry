@@ -7,10 +7,10 @@ import sys
 import Module as m
 import tqdm
 
-f = open("/home/users/phchang/work/lst/samples/CMSSW_12_2_0_pre2/trkNtuple/ttbar_PU200_evt5/hits.txt")
-# f = open("hits_tmp.txt")
+f = open("hits.txt")
 lines = f.readlines()
 hits = {}
+moduleType = {}
 
 # Parse and store hits
 for line in tqdm.tqdm(lines):
@@ -18,6 +18,8 @@ for line in tqdm.tqdm(lines):
         continue
     ls = line.split()
     detid = ls[7]
+    if detid not in moduleType:
+        moduleType[detid] = ls[9]
     hit = (float(ls[1]), float(ls[3]), float(ls[5])) # NOTE in txt file we have z, y, x coordinates 
     if detid not in hits:
         hits[detid] = []
@@ -27,9 +29,9 @@ output = open("data/endcap_orientation.txt", "w")
 
 # Computing two groups of hits
 output.write("# detid average_r2s y_intercept_low_hits slope_low_hits y_intercept_high_hits slope_high_hits\n")
-for detid in hits:
+for detid in tqdm.tqdm(hits):
 
-    mod = m.Module(int(detid))
+    mod = m.Module(int(detid), int(moduleType[detid]))
     isendcap = mod.subdet() == 4
     if not isendcap:
         continue
@@ -96,16 +98,16 @@ for detid in hits:
         sh = -999
 
     # if abs(sl - sh) > 0.5 and (sl != -999 and sh != -999):
-    #     print "ERROR", sl, sh
-    #     print hl
-    #     print hh
+    #     print("ERROR", sl, sh)
+    #     print(hl)
+    #     print(hh)
 
     #     for i in hl:
-    #         print i
+    #         print(i)
 
-    #     print ""
+    #     print("")
     #     for i in hh:
-    #         print i
+    #         print(i)
 
     if sl == -999 and sh != -999:
         sl = sh
@@ -118,7 +120,7 @@ for detid in hits:
         rh = rl
 
     # if sl == -999:
-    #     print detid, avgr2s, yl, sl, yh, sh
+    #     print(detid, avgr2s, yl, sl, yh, sh)
 
     output.write("{} {} {} {} {} {}\n".format(detid, avgr2s, yl, sl, yh, sh))
 

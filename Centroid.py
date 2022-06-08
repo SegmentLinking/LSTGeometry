@@ -10,7 +10,7 @@ class Centroid:
         self.f = open(self.filepath)
         for line in tqdm(self.f.readlines(), desc="Loading centroid data"):
             ls = line.split(",")
-            self.data[int(ls[0])] = [float(ls[1]), float(ls[2]), float(ls[3])]
+            self.data[int(ls[0])] = [float(ls[1]), float(ls[2]), float(ls[3]), int(ls[4])]
 
     def getCentroid(self, detid):
         return self.data[detid]
