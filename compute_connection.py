@@ -292,13 +292,13 @@ def get_curved_line_connections(ref_detid):
 
     return list_of_detids_etaphi_layer_tar
 
-def write_straight_line_connections():
-    write_connections(docurved=False)
+def write_straight_line_connections(output="data/module_connection_tracing_straight.txt"):
+    write_connections(docurved=False,output=output)
 
-def write_curved_line_connections():
-    write_connections(docurved=True)
+def write_curved_line_connections(output="data/module_connection_tracing_curved.txt"):
+    write_connections(docurved=True,output=output)
 
-def write_connections(docurved=False):
+def write_connections(docurved=False,output="data/module_connection_tracing.txt"):
 
     list_of_detids_etaphi_layer_ref = det_geom.getDetIds(
             lambda x:
@@ -331,7 +331,7 @@ def write_connections(docurved=False):
 
     module_map = dict(return_dict)
 
-    f = open("data/module_connection_tracing.txt", "w")
+    f = open(output, "w")
     print("Writing module connections...")
     for ref_detid in sorted(tqdm(module_map.keys())):
         tar_detids = [str(x) for x in module_map[ref_detid]]
@@ -494,7 +494,7 @@ def visualize_connections(connection_file, ref_detid_to_visualize):
 if __name__ == "__main__":
 
     write_straight_line_connections()
-    # write_curved_line_connections()
+    write_curved_line_connections()
 
 
 

@@ -79,12 +79,24 @@ This will place output to:
 
 ## Computing the module maps between the module to another module in a different layer
 
-Use the script:
+To compute module maps based on helices, use the script:
 
     compute_connection.py
 
 If one looks at the ```if __name__ == "__main__":``` area of the script, there are two main functions to be called:
 
-This will place output to:
+   write_straight_line_connections()
+   write_curved_line_connections()
 
-    data/module_connection_tracing.txt
+placing their output to:
+
+    data/module_connection_tracing_straight.txt
+    data/module_connection_tracing_curved.txt
+
+respectively.
+
+To compute module maps based on simulation, use the command:
+
+    root -l -q "compute_sim_connections.C(\"/directory/to/trackingNtuple.root\")" | tail -n +4 >> data/module_connection_tracing_simulation.txt
+
+The several different module maps can be merged together using the `merge_module_map.py` script, after properly modifying the input directories within it.
