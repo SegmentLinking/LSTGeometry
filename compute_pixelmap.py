@@ -79,12 +79,7 @@ def printPixelMap_v1():
     import os
 
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-<<<<<<< HEAD
     det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
-=======
-    det_geom = DetectorGeometry("/data2/segmentlinking/phase2_2020_0428.txt".format(dirpath))
-    centroid = Centroid("data/centroid.txt")
->>>>>>> f7d1c6ea998e9f20c94853cdfb4472bc2668a038
 
     super_bins = {}
 
@@ -126,12 +121,7 @@ def printPixelMap_v2():
     import os
 
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-<<<<<<< HEAD
     det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
-=======
-    det_geom = DetectorGeometry("/data2/segmentlinking/phase2_2020_0428.txt".format(dirpath))
-    centroid = Centroid("data/centroid.txt")
->>>>>>> f7d1c6ea998e9f20c94853cdfb4472bc2668a038
 
     neta = 40.
     nphi = 72.
@@ -236,12 +226,7 @@ def printPixelMap_v3():
     import os
 
     # The text file is a json file with "detid" -> {xyz of 4 corners of the module}
-<<<<<<< HEAD
     det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
-=======
-    det_geom = DetectorGeometry("/data2/segmentlinking/phase2_2020_0428.txt")
-    centroid = Centroid("data/centroid.txt")
->>>>>>> f7d1c6ea998e9f20c94853cdfb4472bc2668a038
 
     # Define the binning of "super bins"
     neta = 25.
