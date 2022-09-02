@@ -70,7 +70,7 @@ def Phi_mpi_pi(phi):
 
 class DetectorGeometry:
 
-    def __init__(self, data):
+    def __init__(self, data, avg_radius, avg_z):
         self.data = data
         self.datafile = open(self.data)
         self.geom_data_raw = json.load(self.datafile)
@@ -84,19 +84,23 @@ class DetectorGeometry:
             self.geom_data[detid] = new_list
 
         # average values
-        self.average_radii = []
-        self.average_radii.append(24.726409077007705) # Layer 1 average radius
-        self.average_radii.append(37.059873804403495) # Layer 2 average radius
-        self.average_radii.append(52.17677700048082)  # Layer 3 average radius
-        self.average_radii.append(68.61016946477243)  # Layer 4 average radius
-        self.average_radii.append(85.91013998484999)  # Layer 5 average radius
-        self.average_radii.append(110.71009476599565) # Layer 6 average radius
-        self.average_zs = []
-        self.average_zs.append(130.93374689440995) # Layer 1 average Z (endcap)
-        self.average_zs.append(154.74990605590062) # Layer 2 average Z (endcap)
-        self.average_zs.append(185.1167890070922)  # Layer 3 average Z (endcap)
-        self.average_zs.append(221.39607712765957) # Layer 4 average Z (endcap)
-        self.average_zs.append(264.76252304964544) # Layer 5 average Z (endcap)
+        f_avg_radius = open(avg_radius)
+        self.average_radii = [ float(x.strip()) for x in f_avg_radius.readlines() ]
+        f_avg_z = open(avg_z)
+        self.average_z = [ float(x.strip()) for x in f_avg_z.readlines() ]
+        # self.average_radii = []
+        # self.average_radii.append(24.726409077007705) # Layer 1 average radius
+        # self.average_radii.append(37.059873804403495) # Layer 2 average radius
+        # self.average_radii.append(52.17677700048082)  # Layer 3 average radius
+        # self.average_radii.append(68.61016946477243)  # Layer 4 average radius
+        # self.average_radii.append(85.91013998484999)  # Layer 5 average radius
+        # self.average_radii.append(110.71009476599565) # Layer 6 average radius
+        # self.average_zs = []
+        # self.average_zs.append(130.93374689440995) # Layer 1 average Z (endcap)
+        # self.average_zs.append(154.74990605590062) # Layer 2 average Z (endcap)
+        # self.average_zs.append(185.1167890070922)  # Layer 3 average Z (endcap)
+        # self.average_zs.append(221.39607712765957) # Layer 4 average Z (endcap)
+        # self.average_zs.append(264.76252304964544) # Layer 5 average Z (endcap)
 
     def getData(self, filt=None):
         if filt:

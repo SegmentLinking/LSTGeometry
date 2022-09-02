@@ -26,7 +26,7 @@ ptthresh = 0.8
 # Setting up detector geometry (centroids and boundaries)
 centroidDB = Centroid("data/centroid.txt")
 dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt")
+det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom", "data/average_radius.txt", "data/average_z.txt")
 det_geom.buildByLayer()
 sdlDisplay = LSTDisplay.LSTDisplay(det_geom)
 

@@ -258,7 +258,7 @@ class LSTDisplay:
 
 def getDefaultLSTDisplay():
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom")
+    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
     sdlDisplay = LSTDisplay(det_geom)
     list_of_detids = det_geom.getDetIds(lambda x: Module(x[0]).subdet() == 5 and Module(x[0]).side() == 3 and Module(x[0]).module() <= 2)
     list_of_detids.sort()
@@ -306,7 +306,7 @@ def test3():
     # fig, ax = plt.subplots(figsize=(5.2,2.*math.pi))
     fig, ax = plt.subplots(figsize=(4. * 2,2.*math.pi))
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt")
+    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
     sdlDisplay = LSTDisplay(det_geom)
     # list_of_detids_etaphi = det_geom.getDetIds(lambda x: Module(x[0]).subdet() == 5 and Module(x[0]).side() == 3 and Module(x[0]).module() == 7 and Module(x[0]).layer() == 1 and Module(x[0]).isLower() == 1 and Module(x[0]).rod() == 1)
     layer = 1
