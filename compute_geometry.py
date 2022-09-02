@@ -47,7 +47,9 @@ module_four_corners_database = {}
 
 for index, detid in enumerate(centroid.data):
 
-    module = m.Module(detid)
+    x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
+
+    module = m.Module(detid, moduleTypeInfo)
 
     # if module.side() != 1:
     #     continue
@@ -64,7 +66,6 @@ for index, detid in enumerate(centroid.data):
     # if module.moduleType() == 1:
     #     continue
 
-    x, y, z = centroid.getCentroid(detid)
     r = math.sqrt(x**2 + y**2)
     phi = math.atan2(y, x)
     phi_ = math.atan2(x, -y)

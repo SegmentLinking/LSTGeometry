@@ -245,11 +245,11 @@ def point_on_square(point, square_boundaries): # inputs are meant to be in 3d in
     edge_vector_2 = edge_vector_2 / edge_norm_2
     point_dot_edge_1 = np.dot(point_relative_vector, edge_vector_1)
     point_dot_edge_2 = np.dot(point_relative_vector, edge_vector_2)
-    print point_relative_vector
-    print edge_vector_1
-    print edge_vector_2
-    print point_dot_edge_1
-    print point_dot_edge_2
+    print(point_relative_vector)
+    print(edge_vector_1)
+    print(edge_vector_2)
+    print(point_dot_edge_1)
+    print(point_dot_edge_2)
     if point_dot_edge_1 >= 0 and point_dot_edge_1 <= edge_norm_1 and point_dot_edge_2 >= 0 and point_dot_edge_2 <= edge_norm_2:
         return True
     else:
@@ -283,12 +283,12 @@ def helix_intersects_module(helix, square_boundaries, centroid):
     edge_vector_2 = np.array(bounds[2] - bounds[1])
     norm_vec = np.cross(edge_vector_1, edge_vector_2)
     norm_vec = norm_vec / np.linalg.norm(norm_vec)
-    print "computing intersection"
-    print norm_vec
-    print centroid
+    print("computing intersection")
+    print(norm_vec)
+    print(centroid)
     point = point_helix_intersection(helix, norm_vec, centroid)
-    print point
-    print bounds
+    print(point)
+    print(bounds)
     if point_on_square(point, square_boundaries):
         return (True, point)
     else:

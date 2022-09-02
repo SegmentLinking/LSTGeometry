@@ -7,10 +7,10 @@ import sys
 import Module as m
 import tqdm
 
-f = open("/home/users/phchang/work/lst/samples/CMSSW_12_2_0_pre2/trkNtuple/ttbar_PU200_evt5/hits.txt")
-# f = open("hits_tmp.txt")
+f = open("hits.txt")
 lines = f.readlines()
 hits = {}
+moduleType = {}
 
 # Parse and store hits
 for line in tqdm.tqdm(lines):
@@ -18,6 +18,8 @@ for line in tqdm.tqdm(lines):
         continue
     ls = line.split()
     detid = ls[7]
+    if detid not in moduleType:
+        moduleType[detid] = ls[9]
     hit = (float(ls[1]), float(ls[3]), float(ls[5])) # NOTE in txt file we have z, y, x coordinates 
     if detid not in hits:
         hits[detid] = []
@@ -29,7 +31,7 @@ output = open("data/tilted_orientation.txt", "w")
 output.write("# detid drdz xy-slope\n")
 for detid in tqdm.tqdm(hits):
 
-    mod = m.Module(int(detid))
+    mod = m.Module(int(detid), int(moduleType[detid]))
     istilt = (mod.side() == 1 or mod.side() == 2) and mod.subdet() == 5
     if not istilt:
         continue
@@ -87,18 +89,18 @@ for detid in tqdm.tqdm(hits):
         sh = r.gROOT.FindObject("pol1").GetParameter(1)
 
         if abs(sl - sh) > 0.005:
-            print "ERROR"
+            print("ERROR")
 
         if abs(yh-yl)/math.sqrt(sl**2+1) == 0:
-            print ""
+            print("")
             for h in hl:
-                print h
-            print ""
+                print(h)
+            print("")
             for h in hh:
-                print h
+                print(h)
             rl = gl.Fit("pol0", "q") # Result of low hits fit
             yl = r.gROOT.FindObject("pol0").GetParameter(0)
-            print yl
+            print(yl)
             sys.exit()
 
         output.write("{} {} {}\n".format(detid, abs(yh-yl)/math.sqrt(sl**2+1)/abs(azs[0]-azs[1]), sl)) #, abs(yh-yl)/math.sqrt(sl**2+1), abs(azs[0] - azs[1])

@@ -2,10 +2,10 @@
 
 import tqdm
 
-f = open("/home/users/phchang/work/lst/samples/CMSSW_12_2_0_pre2/trkNtuple/ttbar_PU200_evt5/hits.txt")
-# f = open("hits_tmp.txt")
+f = open("./hits.txt")
 lines = f.readlines()
 hits = {}
+moduleType = {}
 
 # Parse and store hits
 for line in tqdm.tqdm(lines):
@@ -13,6 +13,8 @@ for line in tqdm.tqdm(lines):
         continue
     ls = line.split()
     detid = ls[7]
+    if detid not in moduleType:
+        moduleType[detid] = ls[9]
     hit = (float(ls[1]), float(ls[3]), float(ls[5])) # NOTE in txt file we have z, y, x coordinates 
     if detid not in hits:
         hits[detid] = []
@@ -34,4 +36,4 @@ for detid in hits:
     avg_y = sum_y / nhits
     avg_z = sum_z / nhits
 
-    output.write("{},{},{},{}\n".format(detid, avg_x, avg_y, avg_z))
+    output.write("{},{},{},{},{}\n".format(detid, avg_x, avg_y, avg_z, moduleType[detid]))
