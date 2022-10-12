@@ -21,8 +21,7 @@ import tqdm
 import math
 from Module import Module
 
-f = open("/home/users/phchang/work/lst/samples/CMSSW_12_2_0_pre2/trkNtuple/ttbar_PU200_evt5/hits.txt")
-# f = open("hits_tmp.txt")
+f = open("hits.txt")
 lines = f.readlines()
 hits = {}
 

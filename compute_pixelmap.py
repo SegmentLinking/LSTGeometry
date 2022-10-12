@@ -79,7 +79,8 @@ def printPixelMap_v1():
     import os
 
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
+    centroid = Centroid("data/centroid.txt")
+    det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
 
     super_bins = {}
 
@@ -89,13 +90,13 @@ def printPixelMap_v1():
     isuper_bin = 0
     pt_bounds = [0.9, 2.0, 4.0, 10., 50.]
     # pt_bounds = [0.9, 2.0]
-    for ipt in xrange(len(pt_bounds)-1):
+    for ipt in range(len(pt_bounds)-1):
         pt_lo = pt_bounds[ipt]
         pt_hi = pt_bounds[ipt+1]
-        for ieta in xrange(int(neta)):
+        for ieta in range(int(neta)):
             eta_lo = -2.6 + (5.2 / neta) * ieta
             eta_hi = -2.6 + (5.2 / neta) * (ieta + 1)
-            for iphi in xrange(int(nphi)):
+            for iphi in range(int(nphi)):
                 phi_lo = -math.pi + (2*math.pi / nphi) * iphi
                 phi_hi = -math.pi + (2*math.pi / nphi) * (iphi + 1)
                 super_bins[isuper_bin] = (pt_lo, pt_hi, eta_lo, eta_hi, phi_lo, phi_hi)
@@ -121,16 +122,17 @@ def printPixelMap_v2():
     import os
 
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
+    centroid = Centroid("data/centroid.txt")
+    det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
 
     neta = 40.
     nphi = 72.
 
     maps = {}
     pt_bounds = [0.9, 2.0, 4.0, 10., 50.]
-    for ipt in xrange(len(pt_bounds)-1):
-        for ieta in xrange(int(neta)):
-            for iphi in xrange(int(nphi)):
+    for ipt in range(len(pt_bounds)-1):
+        for ieta in range(int(neta)):
+            for iphi in range(int(nphi)):
                 maps[(ipt, ieta, iphi)] = {}
                 maps[(ipt, ieta, iphi, 1)] = {}
                 maps[(ipt, ieta, iphi, -1)] = {}
@@ -150,7 +152,7 @@ def printPixelMap_v2():
         # if module.subdet() == 4:
         #     if module.ring() != 1 and module.ring() != 2:
                 # continue
-        for ipt in xrange(len(pt_bounds)-1):
+        for ipt in range(len(pt_bounds)-1):
             pt_lo = pt_bounds[ipt]
             pt_hi = pt_bounds[ipt+1]
             etamin = det_geom.getCompatibleEtaRange(detid, -30, 30)[0]
@@ -195,9 +197,9 @@ def printPixelMap_v2():
             fs[(layer, subdet)] = open("pixelmap/pLS_map_layer{}_subdet{}.txt".format(layer, subdet), "w")
             fs[(layer, subdet, 1)] = open("pixelmap/pLS_map_pos_layer{}_subdet{}.txt".format(layer, subdet), "w")
             fs[(layer, subdet, -1)] = open("pixelmap/pLS_map_neg_layer{}_subdet{}.txt".format(layer, subdet), "w")
-    for ipt in xrange(len(pt_bounds)-1):
-        for ieta in xrange(int(neta)):
-            for iphi in xrange(int(nphi)):
+    for ipt in range(len(pt_bounds)-1):
+        for ieta in range(int(neta)):
+            for iphi in range(int(nphi)):
                 isuperbin = (ipt * nphi * neta) + (ieta * nphi) + iphi
                 all_detids = []
                 all_pos_detids = []
@@ -226,7 +228,8 @@ def printPixelMap_v3():
     import os
 
     # The text file is a json file with "detid" -> {xyz of 4 corners of the module}
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
+    centroid = Centroid("data/centroid.txt")
+    det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
 
     # Define the binning of "super bins"
     neta = 25.
@@ -242,10 +245,10 @@ def printPixelMap_v3():
     maps = {}
 
     # Initialize empty lists for the pixel map 
-    for ipt in xrange(len(pt_bounds)-1):
-        for ieta in xrange(int(neta)):
-            for iphi in xrange(int(nphi)):
-                for iz in xrange(int(nz)):
+    for ipt in range(len(pt_bounds)-1):
+        for ieta in range(int(neta)):
+            for iphi in range(int(nphi)):
+                for iz in range(int(nz)):
 
                     # Maps without split by charge
                     maps[(ipt, ieta, iphi, iz)] = {}
@@ -257,7 +260,7 @@ def printPixelMap_v3():
                     maps[(ipt, ieta, iphi, iz, -1)] = {}
 
                     # The maps will then be split by (layer, subdet)
-                    for layer in [1, 2, 3, 4, 5, 6]:
+                    for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
                         for subdet in [4, 5]:
 
                             # Maps without split by charge
@@ -276,6 +279,7 @@ def printPixelMap_v3():
         # Parse the layer and subdet
         module = Module(detid, moduleTypeInfo)
         layer = module.layer()
+        if layer > 2: continue
         subdet = module.subdet()
 
         # Skip if the module is not PS module and is not lower module
@@ -285,8 +289,8 @@ def printPixelMap_v3():
         # For this module, now compute which super bins they belong to
         # To compute which super bins it belongs to, one needs to provide at least pt and z window to compute compatible eta and phi range
         # So we have a loop in pt and Z
-        for ipt in xrange(len(pt_bounds)-1):
-            for iz in xrange(int(nz)):
+        for ipt in range(len(pt_bounds)-1):
+            for iz in range(int(nz)):
 
                 # The zmin, zmax of consideration
                 zmin = -30 + iz * (60. / nz)
@@ -305,6 +309,10 @@ def printPixelMap_v3():
 
                 etamin -= 0.05
                 etamax += 0.05
+
+                if layer==2 and subdet==4:
+                    if etamax < 2.3: continue
+                    if etamin < 2.3: etamin = 2.3
 
                 # Compute the indices of the compatible eta range
                 ietamin = int((etamin + 2.6) / (5.2 / neta))
@@ -326,13 +334,13 @@ def printPixelMap_v3():
 
                 # if the range is crossing the -pi v. pi boundary special care is needed
                 if iphimin_pos <= iphimax_pos:
-                    phibins_pos = range(iphimin_pos, iphimax_pos)
+                    phibins_pos = list(range(iphimin_pos, iphimax_pos))
                 else:
-                    phibins_pos = range(0, iphimax_pos) + range(iphimin_pos, int(nphi))
+                    phibins_pos = list(range(0, iphimax_pos)) + list(range(iphimin_pos, int(nphi)))
                 if iphimin_neg <= iphimax_neg:
-                    phibins_neg = range(iphimin_neg, iphimax_neg)
+                    phibins_neg = list(range(iphimin_neg, iphimax_neg))
                 else:
-                    phibins_neg = range(0, iphimax_neg) + range(iphimin_neg, int(nphi))
+                    phibins_neg = list(range(0, iphimax_neg)) + list(range(iphimin_neg, int(nphi)))
 
                 # Now we have a list of (ipt, ieta, iphi, iz)'s that are compatible so we fill the map
                 for ieta in etabins:
@@ -356,17 +364,17 @@ def printPixelMap_v3():
 
     # pixel maps split by layers
     fs = {}
-    for layer in [1, 2, 3, 4, 5, 6]:
+    for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
         for subdet in [4, 5]:
             fs[(layer, subdet)] = open("pixelmap/pLS_map_layer{}_subdet{}.txt".format(layer, subdet), "w")
             fs[(layer, subdet, 1)] = open("pixelmap/pLS_map_pos_layer{}_subdet{}.txt".format(layer, subdet), "w")
             fs[(layer, subdet, -1)] = open("pixelmap/pLS_map_neg_layer{}_subdet{}.txt".format(layer, subdet), "w")
 
     # Loop over the super bins
-    for ipt in xrange(len(pt_bounds)-1):
-        for ieta in xrange(int(neta)):
-            for iphi in xrange(int(nphi)):
-                for iz in xrange(int(nz)):
+    for ipt in range(len(pt_bounds)-1):
+        for ieta in range(int(neta)):
+            for iphi in range(int(nphi)):
+                for iz in range(int(nz)):
 
                     # Compute the superbin index the phase-space belongs to
                     isuperbin = (ipt * nphi * neta * nz) + (ieta * nphi * nz) + nz * iphi + iz
@@ -377,7 +385,7 @@ def printPixelMap_v3():
                     all_neg_detids = []
 
                     # Loop over the possible layer and subdets
-                    for layer in [1, 2, 3, 4, 5, 6]:
+                    for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
                         for subdet in [4, 5]:
 
                             # Obtain unique set of detids
@@ -407,41 +415,41 @@ def printPixelMap_v3():
     # Declaring histograms for mapping multiplicities
     ofile = r.TFile("pixelmap/pLS_map.root", "recreate")
     nconns = {}
-    for ipt in xrange(len(pt_bounds)-1):
-        for iz in xrange(int(nz)):
+    for ipt in range(len(pt_bounds)-1):
+        for iz in range(int(nz)):
             nconns[(ipt, iz)] = r.TH2F("pLS_map_ElCheapo_ipt{}_iz{}".format(ipt, iz), "", int(nphi), -math.pi, math.pi, int(neta), -2.6, 2.6)
             nconns[(ipt, iz, 1)] = r.TH2F("pLS_map_pos_ElCheapo_ipt{}_iz{}".format(ipt, iz), "", int(nphi), -math.pi, math.pi, int(neta), -2.6, 2.6)
             nconns[(ipt, iz,-1)] = r.TH2F("pLS_map_neg_ElCheapo_ipt{}_iz{}".format(ipt, iz), "", int(nphi), -math.pi, math.pi, int(neta), -2.6, 2.6)
-            for layer in [1, 2, 3, 4, 5, 6]:
+            for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
                 for subdet in [4, 5]:
                     nconns[(ipt, iz, layer, subdet)] = r.TH2F("pLS_map_layer{}_subdet{}_ipt{}_iz{}".format(layer, subdet, ipt, iz), "", int(nphi), -math.pi, math.pi, int(neta), -2.6, 2.6)
                     nconns[(ipt, iz, layer, subdet, 1)] = r.TH2F("pLS_map_pos_layer{}_subdet{}_ipt{}_iz{}".format(layer, subdet, ipt, iz), "", int(nphi), -math.pi, math.pi, int(neta), -2.6, 2.6)
                     nconns[(ipt, iz, layer, subdet,-1)] = r.TH2F("pLS_map_neg_layer{}_subdet{}_ipt{}_iz{}".format(layer, subdet, ipt, iz), "", int(nphi), -math.pi, math.pi, int(neta), -2.6, 2.6)
 
     # Now filling the histograms
-    for ipt in xrange(len(pt_bounds)-1):
-        for iz in xrange(int(nz)):
-            for ieta in xrange(int(neta)):
-                for iphi in xrange(int(nphi)):
+    for ipt in range(len(pt_bounds)-1):
+        for iz in range(int(nz)):
+            for ieta in range(int(neta)):
+                for iphi in range(int(nphi)):
                     nconns[(ipt, iz)].SetBinContent(iphi + 1, ieta + 1, len(maps[(ipt, ieta, iphi, iz)]["all"]))
                     nconns[(ipt, iz, 1)].SetBinContent(iphi + 1, ieta + 1, len(maps[(ipt, ieta, iphi, iz, 1)]["all"]))
                     nconns[(ipt, iz,-1)].SetBinContent(iphi + 1, ieta + 1, len(maps[(ipt, ieta, iphi, iz,-1)]["all"]))
-            for layer in [1, 2, 3, 4, 5, 6]:
+            for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
                 for subdet in [4, 5]:
-                    for ieta in xrange(int(neta)):
-                        for iphi in xrange(int(nphi)):
+                    for ieta in range(int(neta)):
+                        for iphi in range(int(nphi)):
                             nconns[(ipt, iz, layer, subdet)].SetBinContent(iphi + 1, ieta + 1, len(maps[(ipt, ieta, iphi, iz)][(layer, subdet)]))
                             nconns[(ipt, iz, layer, subdet, 1)].SetBinContent(iphi + 1, ieta + 1, len(maps[(ipt, ieta, iphi, iz, 1)][(layer, subdet)]))
                             nconns[(ipt, iz, layer, subdet,-1)].SetBinContent(iphi + 1, ieta + 1, len(maps[(ipt, ieta, iphi, iz,-1)][(layer, subdet)]))
 
     # Write the Histograms
     ofile.cd()
-    for ipt in xrange(len(pt_bounds)-1):
-        for iz in xrange(int(nz)):
+    for ipt in range(len(pt_bounds)-1):
+        for iz in range(int(nz)):
             nconns[(ipt, iz)].Write()
             nconns[(ipt, iz, 1)].Write()
             nconns[(ipt, iz,-1)].Write()
-            for layer in [1, 2, 3, 4, 5, 6]:
+            for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
                 for subdet in [4, 5]:
                     nconns[(ipt, iz, layer, subdet)].Write()
                     nconns[(ipt, iz, layer, subdet, 1)].Write()
