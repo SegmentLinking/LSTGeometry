@@ -77,10 +77,11 @@ This will place output to:
 
     data/geom.txt
 
-## Computing the module maps between the module to another module in a different layer
+## Computing the module maps between the module to another module in a different layer and with the pixel seeds
 
 Use the script:
 
+    compute_pixelmap.py
     compute_connection.py
 
 If one looks at the ```if __name__ == "__main__":``` area of the script, there are two main functions to be called:
