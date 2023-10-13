@@ -87,7 +87,7 @@ class DetectorGeometry:
         f_avg_radius = open(avg_radius)
         self.average_radii = [ float(x.strip()) for x in f_avg_radius.readlines() ]
         f_avg_z = open(avg_z)
-        self.average_z = [ float(x.strip()) for x in f_avg_z.readlines() ]
+        self.average_zs = [ float(x.strip()) for x in f_avg_z.readlines() ]
         # self.average_radii = []
         # self.average_radii.append(24.726409077007705) # Layer 1 average radius
         # self.average_radii.append(37.059873804403495) # Layer 2 average radius

@@ -26,7 +26,7 @@ ptthresh = 0.8
 # Setting up detector geometry (centroids and boundaries)
 centroidDB = Centroid("data/centroid.txt")
 dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom", "data/average_radius.txt", "data/average_z.txt")
+det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
 det_geom.buildByLayer()
 sdlDisplay = LSTDisplay.LSTDisplay(det_geom)
 
@@ -292,13 +292,13 @@ def get_curved_line_connections(ref_detid):
 
     return list_of_detids_etaphi_layer_tar
 
-def write_straight_line_connections():
-    write_connections(docurved=False)
+def write_straight_line_connections(output="data/module_connection_tracing_straight.txt"):
+    write_connections(docurved=False,output=output)
 
-def write_curved_line_connections():
-    write_connections(docurved=True)
+def write_curved_line_connections(output="data/module_connection_tracing_curved.txt"):
+    write_connections(docurved=True,output=output)
 
-def write_connections(docurved=False):
+def write_connections(docurved=False, output="data/module_connection_tracing.txt"):
 
     list_of_detids_etaphi_layer_ref = det_geom.getDetIds(
             lambda x:
@@ -331,7 +331,7 @@ def write_connections(docurved=False):
 
     module_map = dict(return_dict)
 
-    f = open("data/module_connection_tracing.txt", "w")
+    f = open(output, "w")
     print("Writing module connections...")
     for ref_detid in sorted(tqdm(module_map.keys())):
         tar_detids = [str(x) for x in module_map[ref_detid]]
@@ -493,8 +493,8 @@ def visualize_connections(connection_file, ref_detid_to_visualize):
 
 if __name__ == "__main__":
 
+    write_curved_line_connections()
     write_straight_line_connections()
-    # write_curved_line_connections()
 
 
 
@@ -725,7 +725,3 @@ if __name__ == "__main__":
 # ax.set_xlim(-0.4, 0.4)
 
 # fig.savefig("test3.pdf")
-
-
-
-
