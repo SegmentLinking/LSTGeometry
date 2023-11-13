@@ -1,4 +1,6 @@
 *.pyc
 *.html
 *.pdf
+*.txt
 .ipynb_checkpoints
+data/
