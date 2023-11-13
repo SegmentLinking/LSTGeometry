@@ -31,23 +31,35 @@ Take a PU200 ttbar sample so that we have enough hits to perform some simple fit
 
 ## Printing Hits
 
-The script contains some example of how one wants to print out the hits in the outer tracker container.
+First step of generating the module maps and pixel maps.
+Saves the hits in the outer tracker container to a file.
 One can use the tracking ntuple from the CMSSW output.
 
-    print_hit.C
+    print_hits.py
 
-They will be printed out in the following format. Pipe them to a txt file.
+    Usage:
 
-    x: 28.0882 y: 1.38098 z: -129.049 detId: 411309061
-    x: 27.0796 y: 5.87351 z: -129.049 detId: 411309061
-    x: 27.5126 y: 1.26449 z: -129.049 detId: 411309061
-    x: 27.3692 y: 1.23166 z: -129.049 detId: 411309061
-    x: 26.6629 y: 5.69108 z: -129.049 detId: 411309061
-    x: 27.1555 y: 1.6433 z: -129.049 detId: 411309061
-    x: 26.7019 y: 4.50759 z: -129.049 detId: 411309061
-    x: 27.2155 y: 0.326476 z: -129.049 detId: 411309061
-    x: 26.6088 y: 1.34409 z: -129.049 detId: 411309061
-    x: 26.1426 y: 4.2874 z: -129.049 detId: 411309061
+    Run the script with the following command:
+
+    python print_hits.py [inputfile] [outputfile] [nevents]
+
+    inputfile: Optional. The path to the ROOT file. If not specified, a default path is used.
+    outputfile: Optional. The path to the output text file. If not specified, defaults to hits.txt.
+    nevents: Optional. The maximum number of events to process. If not specified, defaults to 100.
+
+    The script writes the hit data in the following format:
+
+    x: [x-coordinate] y: [y-coordinate] z: [z-coordinate] detId: [detector ID] moduleType: [module type]
+
+    For example:
+
+    x: 109.938 y: -7.6565 z: 101.17 detId: 443363422 moduleType: 25
+    x: 110.055 y: -6.24833 z: 101.17 detId: 443363422 moduleType: 25
+    x: 109.921 y: -7.86728 z: 106.194 detId: 443363422 moduleType: 25
+    x: 109.656 y: -5.61791 z: 115.163 detId: 443363425 moduleType: 25
+    x: 109.517 y: -7.29516 z: 115.163 detId: 443363425 moduleType: 25
+    x: 109.481 y: -5.54475 z: 115.163 detId: 443363426 moduleType: 25
+    x: 109.342 y: -7.22648 z: 115.163 detId: 443363426 moduleType: 25
     ...
 
 ## Computing the Centroids of the modules
