@@ -13,7 +13,6 @@ def process_hits(input_filename, output_filename=None, nevents=100):
     - A list of dictionaries with hit data if output_filename is None, otherwise None.
     """
     import uproot
-    import numpy as np
 
     # Prepare branches to read
     branches = ["ph2_x", "ph2_y", "ph2_z", "ph2_detId", "ph2_moduleType"]
