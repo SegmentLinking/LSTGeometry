@@ -1,4 +1,6 @@
 import sys
+import uproot
+import numpy as np
 
 def process_hits(input_filename, output_filename=None, nevents=100):
     """
@@ -10,33 +12,22 @@ def process_hits(input_filename, output_filename=None, nevents=100):
     - nevents: int, the maximum number of events to process from the ROOT file.
 
     Returns:
-    - A list of dictionaries with hit data if output_filename is None, otherwise None.
+    - A dictionary of arrays with hit data if output_filename is None, otherwise None.
     """
-    import uproot
-
     # Prepare branches to read
     branches = ["ph2_x", "ph2_y", "ph2_z", "ph2_detId", "ph2_moduleType"]
 
     # Define a function to process a single batch of hits
     def process_batch(batch, output_file=None):
-        hit_data_batch = []
-        for i in range(len(batch["ph2_x"])):
-            for hit in range(len(batch["ph2_x"][i])):
-                if output_file:
-                    output_file.write(
-                        f"x: {batch['ph2_x'][i][hit]} y: {batch['ph2_y'][i][hit]} z: {batch['ph2_z'][i][hit]} "
-                        f"detId: {batch['ph2_detId'][i][hit]} moduleType: {batch['ph2_moduleType'][i][hit]}\n"
-                    )
-                else:
-                    hit_info = {
-                        "x": batch["ph2_x"][i][hit],
-                        "y": batch["ph2_y"][i][hit],
-                        "z": batch["ph2_z"][i][hit],
-                        "detId": batch["ph2_detId"][i][hit],
-                        "moduleType": batch["ph2_moduleType"][i][hit]
-                    }
-                    hit_data_batch.append(hit_info)
-        return hit_data_batch
+        if output_file:
+            for x, y, z, detId, moduleType in zip(batch["ph2_x"], batch["ph2_y"], batch["ph2_z"], batch["ph2_detId"], batch["ph2_moduleType"]):
+                for hit in range(len(x)):
+                    output_file.write(f"x: {x[hit]} y: {y[hit]} z: {z[hit]} detId: {detId[hit]} moduleType: {moduleType[hit]}\n")
+        else:
+            batch_data = {key: [] for key in branches}
+            for key in branches:
+                batch_data[key] = np.concatenate(batch[key])
+            return batch_data
 
     # Process the file and write to output file or collect to return
     with uproot.open(input_filename) as file:
@@ -54,10 +45,12 @@ def process_hits(input_filename, output_filename=None, nevents=100):
                 for batch in tree.iterate(branches, library="np", entry_stop=nevents):
                     process_batch(batch, output_file)
         else:
-            hit_data = []
+            hit_data = {key: [] for key in branches}
             for batch in tree.iterate(branches, library="np", entry_stop=nevents):
-                hit_data.extend(process_batch(batch))
-            return hit_data
+                batch_data = process_batch(batch)
+                for key in hit_data:
+                    hit_data[key].extend(batch_data[key])
+            return {k: np.array(v) for k, v in hit_data.items()}
 
 if __name__ == "__main__":
     default_input_file = "/data2/segmentlinking/CMSSW_12_5_0_pre3/RelValTTbar_14TeV_CMSSW_12_5_0_pre3/event_1000.root"
