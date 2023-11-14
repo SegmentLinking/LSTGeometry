@@ -40,7 +40,15 @@ def process_hits(input_filename, output_filename=None, nevents=100):
 
     # Process the file and write to output file or collect to return
     with uproot.open(input_filename) as file:
-        tree = file["trackingNtuple/tree"]
+        try:
+            tree = file["trackingNtuple/tree"]
+        except KeyError:
+            # If trackingNtuple/tree is not found, try to find another tree
+            available_trees = list(file.keys())
+            if not available_trees:
+                raise RuntimeError("No trees found in the ROOT file.")
+            tree = file[available_trees[0]]  # Try the first available tree
+
         if output_filename:
             with open(output_filename, "w") as output_file:
                 for batch in tree.iterate(branches, library="np", entry_stop=nevents):
