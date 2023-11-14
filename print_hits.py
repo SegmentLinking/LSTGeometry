@@ -16,6 +16,9 @@ def process_hits(input_filename, output_filename=None, nevents=100):
     """
     # Prepare branches to read
     branches = ["ph2_x", "ph2_y", "ph2_z", "ph2_detId", "ph2_moduleType"]
+    
+    # Output branches without ph2 prefix
+    out_branches = [branch.replace("ph2_", "") for branch in branches]
 
     # Define a function to process a single batch of hits
     def process_batch(batch, output_file=None):
@@ -24,9 +27,9 @@ def process_hits(input_filename, output_filename=None, nevents=100):
                 for hit in range(len(x)):
                     output_file.write(f"x: {x[hit]} y: {y[hit]} z: {z[hit]} detId: {detId[hit]} moduleType: {moduleType[hit]}\n")
         else:
-            batch_data = {key: [] for key in branches}
-            for key in branches:
-                batch_data[key] = np.concatenate(batch[key])
+            batch_data = {key: [] for key in out_branches}
+            for in_key, out_key in zip(branches, out_branches):
+                batch_data[out_key] = np.concatenate(batch[in_key])
             return batch_data
 
     # Process the file and write to output file or collect to return
@@ -45,7 +48,7 @@ def process_hits(input_filename, output_filename=None, nevents=100):
                 for batch in tree.iterate(branches, library="np", entry_stop=nevents):
                     process_batch(batch, output_file)
         else:
-            hit_data = {key: [] for key in branches}
+            hit_data = {key: [] for key in out_branches}
             for batch in tree.iterate(branches, library="np", entry_stop=nevents):
                 batch_data = process_batch(batch)
                 for key in hit_data:
