@@ -1,4 +1,7 @@
 *.pyc
 *.html
 *.pdf
+*.txt
+.DS_store
 .ipynb_checkpoints
+data/
