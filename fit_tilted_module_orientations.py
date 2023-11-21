@@ -1,111 +1,141 @@
-#!/bin/env python
-
-import ROOT as r
-import math
 import sys
-
-import Module as m
 import tqdm
+import numpy as np
+import Module as m
+from scipy.optimize import curve_fit
 
-f = open("hits.txt")
-lines = f.readlines()
-hits = {}
-moduleType = {}
+def parse_and_store_hits(filename):
+    """
+    Parses the hits from a file and stores them in a dictionary.
 
-# Parse and store hits
-for line in tqdm.tqdm(lines):
-    if "detId" not in line:
-        continue
-    ls = line.split()
-    detid = ls[7]
-    if detid not in moduleType:
-        moduleType[detid] = ls[9]
-    hit = (float(ls[1]), float(ls[3]), float(ls[5])) # NOTE in txt file we have z, y, x coordinates 
-    if detid not in hits:
-        hits[detid] = []
-    hits[detid].append(hit)
+    Parameters:
+    - filename: The path to the input text file.
 
-output = open("data/tilted_orientation.txt", "w")
+    Returns:
+    - hits: A dictionary containing hits grouped by detector ID.
+    - moduleType: A dictionary mapping detector IDs to module types.
+    """
+    hits = {}
+    moduleType = {}
 
-# Computing two groups of hits
-output.write("# detid drdz xy-slope\n")
-for detid in tqdm.tqdm(hits):
+    with open(filename) as f:
+        for line in f:
+            if "detId" not in line:
+                continue
+            ls = line.split()
+            detid = ls[7]
+            moduleType.setdefault(detid, ls[9])
+            hit = (float(ls[1]), float(ls[3]), float(ls[5]))
+            hits.setdefault(detid, []).append(hit)
 
-    mod = m.Module(int(detid), int(moduleType[detid]))
-    istilt = (mod.side() == 1 or mod.side() == 2) and mod.subdet() == 5
-    if not istilt:
-        continue
-    isstrip = mod.moduleLayerType() == 1
-    if not isstrip:
-        continue
+    return hits, moduleType
 
-    # Number of events
-    n = len(hits[detid])
+def compute_hit_groups(detid, hits):
+    """
+    Groups hits based on their z-coordinates into low-z and high-z groups.
 
-    # There are two groups of hits
+    Parameters:
+    - detid: The detector ID.
+    - hits: List of hits for the given detector ID.
 
-    azs = []
-    for ii, hit in enumerate(hits[detid]):
-        azs.append(abs(hit[2]))
-    azs = list(set(azs))
-    azs.sort()
-
-    # Loop again and group them into two groups
-    hl = [] # low-z hits
-    hh = [] # high-z hits
-    xls = []
-    xhs = []
-    for ii, hit in enumerate(hits[detid]):
+    Returns:
+    - low_z_hits: List of hits with lower z-coordinates.
+    - high_z_hits: List of hits with higher z-coordinates.
+    - x_low_z: List of x-coordinates for low-z hits.
+    - x_high_z: List of x-coordinates for high-z hits.
+    - sorted_abs_z: Sorted list of unique absolute z-coordinates.
+    """
+    sorted_abs_z = sorted(set(abs(hit[2]) for hit in hits[detid]))
+    low_z_hits, high_z_hits = [], []
+    x_low_z, x_high_z = [], []
+    for hit in hits[detid]:
         az = abs(hit[2])
-        # put them into two buckets
-        if az == azs[0]:
-            hl.append(hit)
-            xls.append(hit[0])
+        if az == sorted_abs_z[0]:
+            low_z_hits.append(hit)
+            x_low_z.append(hit[0])
         else:
-            hh.append(hit)
-            xhs.append(hit[0])
+            high_z_hits.append(hit)
+            x_high_z.append(hit[0])
+    return low_z_hits, high_z_hits, x_low_z, x_high_z, sorted_abs_z
 
-    # Create two TGraph's for fit
-    gl = r.TGraph(len(hl))
-    gh = r.TGraph(len(hh))
+def linear_fit_func(x, a, b):
+    return a * x + b
 
-    for ii, hit in enumerate(hl):
-        gl.SetPoint(ii, hit[0], hit[1])
+def fit_hits(hits):
+    """
+    Fits a polynomial to the provided hits and returns the fit parameters.
+    Handles special case where all x-coordinates are the same (vertical line).
 
-    # if lying 90 degrees in x-y plane the fit will fail with infinite slope
-    # so take care of it as a special case
+    Parameters:
+    - hits: List of hits to fit.
 
-    if len(list(set(xls))) != 1:
+    Returns:
+    - y_intercept: The y-intercept from the fit.
+    - slope: The slope from the fit, or a special value for vertical lines.
+    """
+    if len(hits) < 2:
+        return -999, -999
 
-        rl = gl.Fit("pol1", "q") # Result of low hits fit
-        yl = r.gROOT.FindObject("pol1").GetParameter(0)
-        sl = r.gROOT.FindObject("pol1").GetParameter(1)
+    x = np.array([hit[0] for hit in hits])
+    y = np.array([hit[1] for hit in hits])
 
-        for ii, hit in enumerate(hh):
-            gh.SetPoint(ii, hit[0], hit[1])
+    # Check if all x-coordinates are the same (vertical line)
+    if np.all(x == x[0]):
+        return -999, -999
 
-        rh = gh.Fit("pol1", "q") # Result of high hits fit
-        yh = r.gROOT.FindObject("pol1").GetParameter(0)
-        sh = r.gROOT.FindObject("pol1").GetParameter(1)
+    try:
+        params, _ = curve_fit(linear_fit_func, x, y)
+        return params[1], params[0]  # y_intercept, slope
+    except RuntimeError:
+        return -999, -999
 
-        if abs(sl - sh) > 0.005:
-            print("ERROR")
+if __name__ == "__main__":
+    # Default file paths
+    default_input_file = "hits.txt"
+    default_output_file = "data/tilted_orientation.txt"
 
-        if abs(yh-yl)/math.sqrt(sl**2+1) == 0:
-            print("")
-            for h in hl:
-                print(h)
-            print("")
-            for h in hh:
-                print(h)
-            rl = gl.Fit("pol0", "q") # Result of low hits fit
-            yl = r.gROOT.FindObject("pol0").GetParameter(0)
-            print(yl)
-            sys.exit()
+    # Check for help flag
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print("\nUsage: python fit_tilted_module_orientations.py [inputfile] [outputfile]")
+        print("\nOptions:")
+        print(f"  inputfile   Path to the input TXT file containing hits data. Default is {default_input_file}")
+        print(f"  outputfile  Path for the output file. Default is {default_output_file}\n")
+        sys.exit()
 
-        output.write("{} {} {}\n".format(detid, abs(yh-yl)/math.sqrt(sl**2+1)/abs(azs[0]-azs[1]), sl)) #, abs(yh-yl)/math.sqrt(sl**2+1), abs(azs[0] - azs[1])
+    # Determine input and output file paths based on arguments provided
+    input_filename = sys.argv[1] if len(sys.argv) > 1 else default_input_file
+    output_filename = sys.argv[2] if len(sys.argv) > 2 else default_output_file
 
-    else:
+    print(f"\nProcessing file: {input_filename}")
+    print(f"Output will be written to: {output_filename}\n")
 
-        output.write("{} {} {}\n".format(detid, abs(list(set(xls))[0]-list(set(xhs))[0])/ abs(azs[0] - azs[1]), 123456789)) #, abs(list(set(xls))[0]-list(set(xhs))[0]), abs(azs[0] - azs[1])
+    # Pull hit data, moduletype from input file
+    hits, moduleType = parse_and_store_hits(input_filename)
 
+    with open(output_filename, "w") as output:
+        output.write("# detid drdz xy-slope\n")
+
+        # Loop through detid's and calculate orientation of each.
+        for detid in tqdm.tqdm(hits):
+            mod = m.Module(int(detid), int(moduleType[detid]))
+
+            istilt = (mod.side() == 1 or mod.side() == 2) and mod.subdet() == 5
+            if not istilt:
+                continue
+
+            isstrip = mod.moduleLayerType() == 1
+            if not isstrip:
+                continue
+
+            low_z_hits, high_z_hits, x_low_z, x_high_z, sorted_abs_z = compute_hit_groups(detid, hits)
+
+            # Get y-intercepts and slopes from fit
+            yl, sl = fit_hits(low_z_hits)
+            yh, sh = fit_hits(high_z_hits)
+
+            if yl != -999 and yh != -999:
+                dydz = abs(yh - yl) / np.sqrt(sl**2 + 1) / abs(sorted_abs_z[0] - sorted_abs_z[1])
+                output.write(f"{detid} {dydz} {sl}\n")
+            else:
+                dxdz = abs(list(set(x_low_z))[0] - list(set(x_high_z))[0]) / abs(sorted_abs_z[0] - sorted_abs_z[1])
+                output.write(f"{detid} {dxdz} 123456789\n")
