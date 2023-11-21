@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:
-        print("\nUsage: python script_name.py [inputfile] [outputfile]")
+        print("\nUsage: python compute_centroid.py [inputfile] [outputfile]")
         print("\nOptions:")
         print(f"  inputfile   Path to the input TXT file containing hits data. Default is {default_input_path}")
         print(f"  outputfile  Path for the output file. Default is {default_output_path}\n")

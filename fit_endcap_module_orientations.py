@@ -1,126 +1,132 @@
-#!/bin/env python
-
-import ROOT as r
-import math
 import sys
-
-import Module as m
 import tqdm
+import Module as m
+from scipy.optimize import curve_fit
 
-f = open("hits.txt")
-lines = f.readlines()
-hits = {}
-moduleType = {}
+def parse_and_store_hits(filename):
+    """
+    Parses the hits from a file and stores them in a dictionary.
 
-# Parse and store hits
-for line in tqdm.tqdm(lines):
-    if "detId" not in line:
-        continue
-    ls = line.split()
-    detid = ls[7]
-    if detid not in moduleType:
-        moduleType[detid] = ls[9]
-    hit = (float(ls[1]), float(ls[3]), float(ls[5])) # NOTE in txt file we have z, y, x coordinates 
-    if detid not in hits:
-        hits[detid] = []
-    hits[detid].append(hit)
+    Parameters:
+    - filename: The path to the input text file.
 
-output = open("data/endcap_orientation.txt", "w")
+    Returns:
+    - hits: A dictionary containing hits grouped by detector ID.
+    - moduleType: A dictionary mapping detector IDs to module types.
+    """
+    hits = {}
+    moduleType = {}
 
-# Computing two groups of hits
-output.write("# detid average_r2s y_intercept_low_hits slope_low_hits y_intercept_high_hits slope_high_hits\n")
-for detid in tqdm.tqdm(hits):
+    with open(filename) as f:
+        for line in f:
+            if "detId" not in line:
+                continue
+            ls = line.split()
+            detid = ls[7]
+            moduleType.setdefault(detid, ls[9])
+            hit = (float(ls[1]), float(ls[3]), float(ls[5]))
+            hits.setdefault(detid, []).append(hit)
 
-    mod = m.Module(int(detid), int(moduleType[detid]))
-    isendcap = mod.subdet() == 4
-    if not isendcap:
-        continue
-    isstrip = mod.moduleLayerType() == 1
-    if not isstrip:
-        continue
+    return hits, moduleType
 
-    # Number of events
+def compute_hit_groups(detid, hits):
+    """
+    Computes two groups of hits based on the average value of radial distance squared.
+
+    Parameters:
+    - detid: The detector ID.
+    - hits: The list of hits for the given detector ID.
+
+    Returns:
+    - low_hits: Hits with lower radial distance squared.
+    - high_hits: Hits with higher radial distance squared.
+    """
     n = len(hits[detid])
-
-    # There are two groups of hits
-    # The average value of r^2's will be used to divide the hits into two groups
-
-    # Trying to group into two hits
-    r2s = []
-
-    # compute r^2 = x^2 + y^2
-    sumr2s = 0
-    for ii, hit in enumerate(hits[detid]):
-        r2 = hit[0]**2 + hit[1]**2
-        r2s.append(r2)
-        sumr2s += r2
-
-    # The average value
+    sumr2s = sum(hit[0]**2 + hit[1]**2 for hit in hits[detid])
     avgr2s = sumr2s / n
 
-    # Loop again and group them into two groups
-    hl = [] # low hits
-    hh = [] # high hits
-    for ii, hit in enumerate(hits[detid]):
-        r2 = hit[0]**2 + hit[1]**2
-        # put them into two buckets
-        if r2 < avgr2s:
-            hl.append(hit)
-        else:
-            hh.append(hit)
+    low_hits = [hit for hit in hits[detid] if (hit[0]**2 + hit[1]**2) < avgr2s]
+    high_hits = [hit for hit in hits[detid] if (hit[0]**2 + hit[1]**2) >= avgr2s]
 
-    # Create two TGraph's for fit
-    gl = r.TGraph(len(hl))
-    gh = r.TGraph(len(hh))
+    return low_hits, high_hits
 
-    for ii, hit in enumerate(hl):
-        gl.SetPoint(ii, hit[0], hit[1])
+def linear_fit_func(x, a, b):
+    return a * x + b
 
-    if len(hl) > 1:
-        rl = gl.Fit("pol1", "q") # Result of low hits fit
-        yl = r.gROOT.FindObject("pol1").GetParameter(0)
-        sl = r.gROOT.FindObject("pol1").GetParameter(1)
-    else:
-        rl = -999
-        yl = -999
-        sl = -999
+def fit_hits(hits):
+    """
+    Fits a polynomial to the provided hits and returns the fit parameters.
 
-    for ii, hit in enumerate(hh):
-        gh.SetPoint(ii, hit[0], hit[1])
+    Parameters:
+    - hits: List of hits to fit.
 
-    if len(hh) > 1:
-        rh = gh.Fit("pol1", "q") # Result of high hits fit
-        yh = r.gROOT.FindObject("pol1").GetParameter(0)
-        sh = r.gROOT.FindObject("pol1").GetParameter(1)
-    else:
-        rh = -999
-        yh = -999
-        sh = -999
+    Returns:
+    - y_intercept: The y-intercept from the fit.
+    - slope: The slope from the fit.
+    """
+    if len(hits) < 2:
+        return -999, -999
 
-    # if abs(sl - sh) > 0.5 and (sl != -999 and sh != -999):
-    #     print("ERROR", sl, sh)
-    #     print(hl)
-    #     print(hh)
+    # Extract x and y coordinates
+    x = [hit[0] for hit in hits]
+    y = [hit[1] for hit in hits]
 
-    #     for i in hl:
-    #         print(i)
+    try:
+        # Fit the data
+        params, _ = curve_fit(linear_fit_func, x, y)
+        return params[1], params[0]  # y_intercept, slope
+    except RuntimeError:
+        # Fit failed
+        return -999, -999
 
-    #     print("")
-    #     for i in hh:
-    #         print(i)
+if __name__ == "__main__":
+    # Default file paths
+    default_input_file = "hits.txt"
+    default_output_file = "data/endcap_orientation.txt"
 
-    if sl == -999 and sh != -999:
-        sl = sh
-        yl = yh
-        rl = rh
+    # Check for help flag
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print("\nUsage: python fit_endcap_module_orientations.py [inputfile] [outputfile]")
+        print("\nOptions:")
+        print(f"  inputfile   Path to the input TXT file containing hits data. Default is {default_input_file}")
+        print(f"  outputfile  Path for the output file. Default is {default_output_file}\n")
+        sys.exit()
 
-    if sl != -999 and sh == -999:
-        sh = sl
-        yh = yl
-        rh = rl
+    # Determine input and output file paths based on arguments provided
+    input_filename = sys.argv[1] if len(sys.argv) > 1 else default_input_file
+    output_filename = sys.argv[2] if len(sys.argv) > 2 else default_output_file
 
-    # if sl == -999:
-    #     print(detid, avgr2s, yl, sl, yh, sh)
+    print(f"\nProcessing file: {input_filename}")
+    print(f"Output will be written to: {output_filename}\n")
 
-    output.write("{} {} {} {} {} {}\n".format(detid, avgr2s, yl, sl, yh, sh))
+    # Pull hit data, moduletype from input file
+    hits, moduleType = parse_and_store_hits(input_filename)
 
+    with open(output_filename, "w") as output:
+        output.write("# detid average_r2s y_intercept_low_hits slope_low_hits y_intercept_high_hits slope_high_hits\n")
+
+        # Loop through detid's and calculate orientation of each.
+        for detid in tqdm.tqdm(hits):
+            mod = m.Module(int(detid), int(moduleType[detid]))
+
+            isendcap = mod.subdet() == 4
+            if not isendcap:
+                continue
+
+            isstrip = mod.moduleLayerType() == 1
+            if not isstrip:
+                continue
+
+            low_hits, high_hits = compute_hit_groups(detid, hits)
+
+            # Get y-intercepts and slopes from fit
+            yl, sl = fit_hits(low_hits)
+            yh, sh = fit_hits(high_hits)
+
+            # Adjustments for missing fits
+            if sl == -999 and sh != -999:
+                sl, yl = sh, yh
+            elif sl != -999 and sh == -999:
+                sh, yh = sl, yl
+
+            output.write(f"{detid} {sum(hit[0]**2 + hit[1]**2 for hit in hits[detid]) / len(hits[detid])} {yl} {sl} {yh} {sh}\n")
