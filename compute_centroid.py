@@ -1,101 +1,81 @@
 import sys
 import numpy as np
+import pandas as pd
 
-def parse_hits(file_path):
+# Function to extract bits from detId
+def extract_bits(value, start, end):
+    mask = (1 << (end - start + 1)) - 1
+    return (value >> start) & mask
+
+def parse_module_type(det_id):
     """
-    Parses the input txt file to extract hits data.
-
-    Parameters:
-    file_path (str): Path to the input file containing hits data.
-
-    Returns:
-    dict: A dictionary containing NumPy arrays for x, y, z coordinates, detId, and moduleType.
+    Get the numerical module type from the given detId.
     """
-    x, y, z, detIds, moduleTypes = [], [], [], [], []
-    uniqueDetIds = set()
+    # Check if the first digit of detId is '3' for inner tracker
+    if str(det_id)[0] == '3':
+        return -1
 
-    with open(file_path) as f:
-        lines = f.readlines()
+    # Define constants for subdetectors
+    BARREL = 5
+    ENDCAP = 4
 
-    for line in lines:
-        if "detId" not in line:
-            continue
-        ls = line.split()
+    # Constants for module types
+    PS = 23
+    PSS = 24
+    TwoS = 25
 
-        # Append values for this line to relevant arrays
-        x.append(float(ls[1]))  # x coordinate
-        y.append(float(ls[3]))  # y coordinate
-        z.append(float(ls[5]))  # z coordinate
-        detIds.append(int(ls[7]))
-        moduleTypes.append(int(ls[9]))
+    # Parse subdet, layer, and ring
+    subdet = extract_bits(det_id, 25, 27)
+    layer = extract_bits(det_id, 18, 20) if subdet == ENDCAP else extract_bits(det_id, 20, 22)
+    ring = extract_bits(det_id, 12, 15) if subdet == ENDCAP else 0
 
-    return {'x': np.array(x, dtype=np.float32), 
-            'y': np.array(y, dtype=np.float32), 
-            'z': np.array(z, dtype=np.float32), 
-            'detId': np.array(detIds, dtype=np.uint32), 
-            'moduleType': np.array(moduleTypes, dtype=np.uint32)}
+    # Determine module type based on subdet, layer, and ring
+    if subdet == BARREL:
+        return PS if layer <= 3 else TwoS
+    elif subdet == ENDCAP:
+        if layer <= 2:
+            return PS if ring <= 10 else TwoS
+        else:
+            return PS if ring <= 7 else TwoS
+    else:
+        raise ValueError("Invalid subdet value")
 
-def calculate_centroids(hit_data):
-    """
-    Calculates centroids for each unique detector ID (detId) using the provided hit data.
+def process_csv(file_path):
+    df_parsed = pd.read_csv(file_path)
 
-    Parameters:
-    hit_data (dict): A dictionary containing NumPy arrays for x, y, z coordinates, and detId.
+    # Extracting rho, phi, Z, and detid from the dataframe
+    rho = df_parsed[' sensorCenterRho_mm/D']
+    phi_deg = df_parsed[' phi_deg/D']
+    z = df_parsed[' sensorCenterZ_mm/D']
+    detid = df_parsed['DetId/i']
 
-    Returns:
-    dict: A dictionary with centroids (mean positions) for each unique detId.
-    """
-    unique_detIds = np.unique(hit_data['detId'])
+    # Extract moduleType for each detid
+    moduleType = np.array([parse_module_type(d) for d in detid])
 
-    # Initialize centroids
-    centroids = {}
+    # Remove sensors from inner tracker
+    itmask = moduleType != -1
+    rho, phi_deg, z, detid, moduleType = rho[itmask], phi_deg[itmask], z[itmask], detid[itmask], moduleType[itmask]
 
-    # Calculate weighted sums for x, y, z coordinates
-    sums_x = np.bincount(hit_data['detId'], weights=hit_data['x'])
-    sums_y = np.bincount(hit_data['detId'], weights=hit_data['y'])
-    sums_z = np.bincount(hit_data['detId'], weights=hit_data['z'])
+    # Converting phi from degrees to radians and calculating X and Y from rho, phi
+    phi_rad = np.radians(phi_deg)
+    x = rho * np.cos(phi_rad)
+    y = rho * np.sin(phi_rad)
 
-    # Count occurrences of each detId
-    counts = np.bincount(hit_data['detId'])
+    # Account for scaling difference used in excel sheet.
+    x, y, z = x/10, y/10, z/10
 
-    # Calculate centroids
-    for detId in unique_detIds:
-        centroids[detId] = np.array([
-            sums_x[detId] / counts[detId], 
-            sums_y[detId] / counts[detId], 
-            sums_z[detId] / counts[detId]
-        ])
-
-    return centroids
-
-def calculate_module_types(hit_data):
-    """
-    Extracts module types for each unique detector ID (detId) from the provided hit data.
-
-    Parameters:
-    hit_data (dict): A dictionary containing NumPy arrays for detId and moduleType.
-
-    Returns:
-    dict: A dictionary mapping each unique detId to its module type.
-    """
-    # Extract unique detector IDs and their first occurrence indices
-    unique_detIds, first_indices = np.unique(hit_data['detId'], return_index=True)
-
-    # Map each unique detId to its corresponding moduleType using the first occurrence
-    moduleTypes = {hit_data['detId'][index]: hit_data['moduleType'][index] for index in first_indices}
-
-    return moduleTypes
+    return x, y, z, detid, moduleType
 
 if __name__ == "__main__":
     # Default file paths
-    default_input_path = "./hits.txt"
+    default_input_path = "data/DetId_sensors_list.csv"
     default_output_path = "data/centroid.txt"
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:
         print("\nUsage: python compute_centroid.py [inputfile] [outputfile]")
         print("\nOptions:")
-        print(f"  inputfile   Path to the input TXT file containing hits data. Default is {default_input_path}")
+        print(f"  inputfile   Path to the input CSV file. Default is {default_input_path}")
         print(f"  outputfile  Path for the output file. Default is {default_output_path}\n")
         sys.exit()
 
@@ -103,17 +83,13 @@ if __name__ == "__main__":
     input_path = sys.argv[1] if len(sys.argv) > 1 else default_input_path
     output_path = sys.argv[2] if len(sys.argv) > 2 else default_output_path
 
-    print(f"\nProcessing file: {input_path}")
-    print(f"Output will be written to: {output_path}\n")
+    # Process CSV file
+    x, y, z, detid, moduleType = process_csv(input_path)
 
-    # Get hit info from input txt file
-    hit_data = parse_hits(input_path)
-    
-    # Calculate centroids and moduleType dictionary
-    centroids = calculate_centroids(hit_data)
-    moduleType = calculate_module_types(hit_data)
-
-    # Write the centroid data and moduletype to the specified output file
+    # Write the data to the specified output file
     with open(output_path, "w") as output:
-        for detid, centroid in centroids.items():
-            output.write(f"{detid},{centroid[0]},{centroid[1]},{centroid[2]},{moduleType[detid]}\n")
+        for i in range(len(x)):
+            output.write(f"{detid[i]},{x[i]},{y[i]},{z[i]},{moduleType[i]}\n")
+
+    print(f"\nProcessed file: {input_path}")
+    print(f"Output written to: {output_path}\n")
