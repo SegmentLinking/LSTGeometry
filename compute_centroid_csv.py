@@ -2,14 +2,32 @@ import sys
 import numpy as np
 import pandas as pd
 
-# Function to extract bits from detId
 def extract_bits(value, start, end):
+    """
+    Extracts a specific range of bits from an integer value.
+
+    Parameters:
+    value (int): The integer from which bits will be extracted.
+    start (int): The starting bit position (inclusive).
+    end (int): The ending bit position (inclusive).
+
+    Returns:
+    int: The extracted bits as an integer.
+    """
     mask = (1 << (end - start + 1)) - 1
     return (value >> start) & mask
 
 def parse_module_type(det_id):
     """
-    Get the numerical module type from the given detId.
+    Determines the module type of a sensor based on its detector ID.
+
+    Parameters:
+    det_id (int): The detector ID of the sensor.
+
+    Returns:
+    int: The numerical module type. 
+         -1 (not considered) for inner tracker modules,
+         23 (PS), 24 (PSS), or 25 (TwoS) for different module types.
     """
     # Check if the first digit of detId is '3' for inner tracker
     if str(det_id)[0] == '3':
@@ -41,6 +59,18 @@ def parse_module_type(det_id):
         raise ValueError("Invalid subdet value")
 
 def process_csv(file_path):
+    """
+    Use CSV file containing sensor data (rho, phi, Z, detid) to return sensor centroid coordinates (X, Y, Z).
+
+    Parameters:
+    file_path (str): The path to the sensor CSV file to be processed.
+
+    Returns:
+    tuple: A tuple containing the processed data arrays (x, y, z, detid, moduleType).
+
+    Note:
+    Excel spreadsheet values are given in mm, but later scripts expect this scaled by 1/10.
+    """
     df_parsed = pd.read_csv(file_path)
 
     # Extracting rho, phi, Z, and detid from the dataframe
