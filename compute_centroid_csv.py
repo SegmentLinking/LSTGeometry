@@ -26,7 +26,7 @@ def parse_module_type(det_id):
 
     Returns:
     int: The numerical module type. 
-         -1 (not considered) for inner tracker modules,
+         -1 for inner tracker modules,
          23 (PS), 24 (PSS), or 25 (TwoS) for different module types.
     """
     # Check if the first digit of detId is '3' for inner tracker
@@ -44,17 +44,21 @@ def parse_module_type(det_id):
 
     # Parse subdet, layer, and ring
     subdet = extract_bits(det_id, 25, 27)
-    layer = extract_bits(det_id, 18, 20) if subdet == ENDCAP else extract_bits(det_id, 20, 22)
+    layer = extract_bits(det_id, 20, 22) if subdet == BARREL else extract_bits(det_id, 18, 20)
     ring = extract_bits(det_id, 12, 15) if subdet == ENDCAP else 0
 
     # Determine module type based on subdet, layer, and ring
+    is_even_det_id = det_id % 2 == 0
     if subdet == BARREL:
-        return PS if layer <= 3 else TwoS
+        if layer <= 3:
+            return PSS if is_even_det_id else PS
+        else:
+            return TwoS
     elif subdet == ENDCAP:
         if layer <= 2:
-            return PS if ring <= 10 else TwoS
+            return PSS if ring <= 10 and is_even_det_id else (PS if ring <= 10 else TwoS)
         else:
-            return PS if ring <= 7 else TwoS
+            return PSS if ring <= 7 and is_even_det_id else (PS if ring <= 7 else TwoS)
     else:
         raise ValueError("Invalid subdet value")
 
