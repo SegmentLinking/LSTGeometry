@@ -27,7 +27,11 @@ def parse_module_type(det_id):
     Returns:
     int: The numerical module type. 
          -1 for inner tracker modules,
-         23 (PS), 24 (PSS), or 25 (TwoS) for different module types.
+         23 (PSP), 24 (PSS), or 25 (TwoS) for different module types.
+    
+    Note: 
+    For more information, see
+    https://github.com/cms-sw/cmssw/tree/master/Geometry/TrackerGeometryBuilder
     """
     # Check if the first digit of detId is '3' for inner tracker
     if str(det_id)[0] == '3':
@@ -38,7 +42,7 @@ def parse_module_type(det_id):
     ENDCAP = 4
 
     # Constants for module types
-    PS = 23
+    PSP = 23
     PSS = 24
     TwoS = 25
 
@@ -51,14 +55,14 @@ def parse_module_type(det_id):
     is_even_det_id = det_id % 2 == 0
     if subdet == BARREL:
         if layer <= 3:
-            return PSS if is_even_det_id else PS
+            return PSS if is_even_det_id else PSP
         else:
             return TwoS
     elif subdet == ENDCAP:
         if layer <= 2:
-            return PSS if ring <= 10 and is_even_det_id else (PS if ring <= 10 else TwoS)
+            return PSS if ring <= 10 and is_even_det_id else (PSP if ring <= 10 else TwoS)
         else:
-            return PSS if ring <= 7 and is_even_det_id else (PS if ring <= 7 else TwoS)
+            return PSS if ring <= 7 and is_even_det_id else (PSP if ring <= 7 else TwoS)
     else:
         raise ValueError("Invalid subdet value")
 
