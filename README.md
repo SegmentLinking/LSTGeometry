@@ -29,6 +29,16 @@ Take a PU200 ttbar sample so that we have enough hits to perform some simple fit
     # remember the port number and do something like the following on your local computer
     ssh -N -f -L localhost:$port:localhost:$port uaf-$uaf.t2.ucsd.edu
 
+## Geometry File Information
+
+The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracker version OT806_IT741:
+
+- URL: [Tracker Version OT806_IT741](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT806_IT741/info.html)
+
+Sources for specific files:
+- `allCoordinates.csv` (renamed `module_info.csv`) is available at [OT806_IT741 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT806_IT741/layout.html)
+- `DetId_sensors_list.csv` can be found linked from the homepage of the above URL.
+
 ## Printing Hits
 
 First step of generating the module maps and pixel maps.
@@ -61,6 +71,20 @@ One can use the tracking ntuple from the CMSSW output.
     x: 109.481 y: -5.54475 z: 115.163 detId: 443363426 moduleType: 25
     x: 109.342 y: -7.22648 z: 115.163 detId: 443363426 moduleType: 25
     ...
+
+## Compute Centroids (CSV)
+
+Alternative way of computing the sensor centroids using the CSV files in /data/ directly 
+instead of using the hit information computed in the previous step.
+
+Usage:
+
+    Run `python compute_centroid_csv.py` for default file paths.
+
+    For custom paths: `python compute_centroid_csv.py [inputfile] [outputfile]`
+    Replace `[inputfile]` and `[outputfile]` with your specific file paths.
+    Default input: `data/DetId_sensors_list_OT806_IT741.csv`
+    Default output: `data/centroid.txt`
 
 ## Computing the Centroids of the modules
 

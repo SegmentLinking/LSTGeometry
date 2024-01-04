@@ -30,7 +30,9 @@ def parse_module_type(det_id):
          23 (PSP), 24 (PSS), or 25 (TwoS) for different module types.
     
     Note: 
-    For more information, see
+    For more information, see below. If possible this should be replaced
+    with a more robust solution like getting the module type directly
+    from CMSSW.
     https://github.com/cms-sw/cmssw/tree/master/Geometry/TrackerGeometryBuilder
     """
     # Check if the first digit of detId is '3' for inner tracker
@@ -106,7 +108,7 @@ def process_csv(file_path):
 
 if __name__ == "__main__":
     # Default file paths
-    default_input_path = "data/DetId_sensors_list.csv"
+    default_input_path = "data/DetId_sensors_list_OT806_IT741.csv"
     default_output_path = "data/centroid.txt"
 
     # Check for help flag
