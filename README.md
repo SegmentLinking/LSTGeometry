@@ -31,12 +31,12 @@ Take a PU200 ttbar sample so that we have enough hits to perform some simple fit
 
 ## Geometry File Information
 
-The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracker version OT806_IT741:
+The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracker version OT800_IT615:
 
-- URL: [Tracker Version OT806_IT741](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT806_IT741/info.html)
+- URL: [Tracker Version OT800_IT615](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/info.html)
 
 Sources for specific files:
-- `allCoordinates.csv` (renamed `module_info.csv`) is available at [OT806_IT741 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT806_IT741/layout.html)
+- `allCoordinates.csv` (renamed `module_info.csv`) is available at [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html)
 - `DetId_sensors_list.csv` can be found linked from the homepage of the above URL.
 
 ## Printing Hits
@@ -83,7 +83,7 @@ Usage:
 
     For custom paths: `python compute_centroid_csv.py [inputfile] [outputfile]`
     Replace `[inputfile]` and `[outputfile]` with your specific file paths.
-    Default input: `data/DetId_sensors_list_OT806_IT741.csv`
+    Default input: `data/DetId_sensors_list_OT800_IT615.csv`
     Default output: `data/centroid.txt`
 
 ## Computing the Centroids of the modules

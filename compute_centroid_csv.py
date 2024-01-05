@@ -108,7 +108,7 @@ def process_csv(file_path):
 
 if __name__ == "__main__":
     # Default file paths
-    default_input_path = "data/DetId_sensors_list_OT806_IT741.csv"
+    default_input_path = "data/DetId_sensors_list_OT800_IT615.csv"
     default_output_path = "data/centroid.txt"
 
     # Check for help flag
