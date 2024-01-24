@@ -168,8 +168,8 @@ def assign_corners_to_sensor(module_csv, sensor_csv):
         # Grab each sensor's true X,Y,Z centroid position from the CSV file
         sensor_index_1 = sensor_csv[sensor_csv['DetId/i'] == sensor_det_id_1].index[0]
         sensor_index_2 = sensor_csv[sensor_csv['DetId/i'] == sensor_det_id_2].index[0]
-        sensor_centroid_1 = np.array([sensor_x[sensor_index_1], sensor_y[sensor_index_1], sensor_z[sensor_index_1]])
-        sensor_centroid_2 = np.array([sensor_x[sensor_index_2], sensor_y[sensor_index_2], sensor_z[sensor_index_2]])
+        sensor_centroid_1 = np.array([sensor_z[sensor_index_1], sensor_x[sensor_index_1], sensor_y[sensor_index_1]])
+        sensor_centroid_2 = np.array([sensor_z[sensor_index_2], sensor_x[sensor_index_2], sensor_y[sensor_index_2]])
 
         # Scale these from mm to cm in order to compare
         sensor_centroid_1 = sensor_centroid_1 / 10
@@ -177,7 +177,7 @@ def assign_corners_to_sensor(module_csv, sensor_csv):
 
         # Calculate distances from true centroids to transformed coordinate centroids and find best match.
         distance_to_sensor_1 = np.linalg.norm(centroid_sensor_1 - sensor_centroid_1)
-        distance_to_sensor_2 = np.linalg.norm(centroid_sensor_2 - sensor_centroid_2)
+        distance_to_sensor_2 = np.linalg.norm(centroid_sensor_2 - sensor_centroid_1)
         if distance_to_sensor_1 < distance_to_sensor_2:
             transformed_corners_dict[str(sensor_det_id_1)] = transformed_corners[:4]
             transformed_corners_dict[str(sensor_det_id_2)] = transformed_corners[4:]
