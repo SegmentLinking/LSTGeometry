@@ -104,6 +104,16 @@ def transform_sensor_corners(df_row):
     half_width = sensor_width / 2
     half_length = sensor_length / 2
     half_spacing = sensor_spacing / 2
+
+    # Make the module sizes consistent with hit-based method.
+    # FIXME: Using the real (smaller) sizes specified by CSV file increases
+    # fake rate significantly and lowers efficiency between abs(eta) 1 to 2. 
+    half_width = 50.0
+    if half_length > 40:
+        half_length = 50.0
+    else:
+        half_length = 25.0
+
     corners = np.array([
         [-half_spacing, -half_width, -half_length],
         [-half_spacing, -half_width, half_length],

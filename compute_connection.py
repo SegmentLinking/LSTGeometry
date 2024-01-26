@@ -1,6 +1,7 @@
 #!/bin/env python
 
 import numpy as np
+import sys
 import os
 import math
 import matplotlib
@@ -22,13 +23,6 @@ import multiprocessing
 
 # ptthresh = 1
 ptthresh = 0.8
-
-# Setting up detector geometry (centroids and boundaries)
-centroidDB = Centroid("data/centroid.txt")
-dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
-det_geom.buildByLayer()
-sdlDisplay = LSTDisplay.LSTDisplay(det_geom)
 
 def get_straight_line_connections_parallel(ref_detid, return_dict={}):
     return_dict[ref_detid] = get_straight_line_connections(ref_detid)
@@ -492,6 +486,34 @@ def visualize_connections(connection_file, ref_detid_to_visualize):
             break
 
 if __name__ == "__main__":
+    # Default file paths
+    default_centroid_file = "data/centroid.txt"
+    default_geom_file = "data/geom.txt"
+    default_average_radius_file = "data/average_r_OT800_IT615.txt"
+    default_average_z_file = "data/average_z_OT800_IT615.txt"
+
+    # Check for help flag
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print("\nUsage: python compute_connection.py [centroid_file] [geom_file] [average_radius_file] [average_z_file]")
+        print("\nOptions:")
+        print(f"  centroid_file          Path to the centroid file. Default is {default_centroid_file}")
+        print(f"  geom_file              Path to the geometry file. Default is {default_geom_file}")
+        print(f"  average_radius_file    Path to the average radius file. Default is {default_average_radius_file}")
+        print(f"  average_z_file         Path to the average z file. Default is {default_average_z_file}")
+        sys.exit()
+
+    # Determine file paths based on arguments provided
+    centroid_file = sys.argv[1] if len(sys.argv) > 1 else default_centroid_file
+    geom_file = sys.argv[2] if len(sys.argv) > 2 else default_geom_file
+    average_radius_file = sys.argv[3] if len(sys.argv) > 3 else default_average_radius_file
+    average_z_file = sys.argv[4] if len(sys.argv) > 4 else default_average_z_file
+
+    # Setting up detector geometry (centroids and boundaries)
+    centroidDB = Centroid(centroid_file)
+    dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    det_geom = DetectorGeometry(geom_file, average_radius_file, average_z_file)
+    det_geom.buildByLayer()
+    sdlDisplay = LSTDisplay.LSTDisplay(det_geom)
 
     write_curved_line_connections()
     write_straight_line_connections()
