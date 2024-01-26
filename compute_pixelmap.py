@@ -443,7 +443,7 @@ if __name__ == "__main__":
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:
-        print("\nUsage: python compute_connection.py [centroid_file] [geom_file] [average_radius_file] [average_z_file]")
+        print("\nUsage: python compute_pixelmap.py [centroid_file] [geom_file] [average_radius_file] [average_z_file]")
         print("\nOptions:")
         print(f"  centroid_file          Path to the centroid file. Default is {default_centroid_file}")
         print(f"  geom_file              Path to the geometry file. Default is {default_geom_file}")

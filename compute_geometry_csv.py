@@ -41,17 +41,29 @@ def tangential_rotation_matrix(phi, theta):
     # Get the rotation matrix using Rodrigues' rotation formula
     return rodrigues_rotation_matrix(tangential_vector, theta)
 
-def rotation_matrix(tilt_deg, phi_deg):
+def rotation_matrix(tilt_deg, skew_deg, yaw_deg, phi_deg):
     """
     Computes the final rotation matrix based on tilt and phi angles.
 
     Parameters:
     tilt_deg (float): The tilt angle in degrees.
+    skew_deg (float): The skew angle in degrees.
+    yaw_deg (float): The yaw angle in degrees.
     phi_deg (float): The phi angle in degrees.
     
     Returns:
     numpy.ndarray: The final rotation matrix.
+
+    Note:
+    Only the tilt angles are non-zero for the current geometry. If the other
+    angles get used, implement their rotations using the tangential_rotation_matrix
+    function above as an example.
     """
+    # Check if skew and yaw angles are non-zero
+    if skew_deg != 0 or yaw_deg != 0:
+        raise ValueError(f"Non-zero skew or yaw angles found. See note in rotation_matrix code."
+                         f"Tilt: {tilt_deg}, Skew: {skew_deg}, Yaw: {yaw_deg}, Phi: {phi_deg}")
+
     # Convert angles from degrees to radians
     tilt_rad = np.radians(tilt_deg)
     phi_rad = np.radians(phi_deg)
@@ -126,7 +138,11 @@ def transform_sensor_corners(df_row):
     ])
 
     # Apply rotation matrix
-    R = rotation_matrix(df_row[" tiltAngle_deg/D"], df_row[" phi_deg/D"])
+    R = rotation_matrix(df_row[" tiltAngle_deg/D"],
+                        df_row[" skewAngle_deg/D"],
+                        df_row[" yawAngle_deg/D"],
+                        df_row[" phi_deg/D"])
+
     rotated_corners = np.dot(R, corners.T).T
     
     # Apply final coordinate shift
