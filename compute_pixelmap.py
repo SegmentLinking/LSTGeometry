@@ -2,6 +2,8 @@
 
 import ROOT as r
 import json
+import os
+import sys
 from tqdm import tqdm
 from Module import Module
 from Centroid import Centroid
@@ -71,17 +73,10 @@ def Phi_mpi_pi(phi):
     while phi < -math.pi: phi += 2. * math.pi;
     return phi;
 
-def printPixelMap():
-    printPixelMap_v3()
+def printPixelMap(centroid, det_geom):
+    printPixelMap_v3(centroid, det_geom)
 
-def printPixelMap_v1():
-
-    import os
-
-    dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    centroid = Centroid("data/centroid.txt")
-    det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
-
+def printPixelMap_v1(centroid, det_geom):
     super_bins = {}
 
     neta = 40.
@@ -117,14 +112,7 @@ def printPixelMap_v1():
                             maps[isuper_bin].append(detid)
                 print(isuper_bin, layer, subdet, bounds[2], bounds[3], bounds[4], bounds[5], maps[isuper_bin])
 
-def printPixelMap_v2():
-
-    import os
-
-    dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    centroid = Centroid("data/centroid.txt")
-    det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
-
+def printPixelMap_v2(centroid, det_geom):
     neta = 40.
     nphi = 72.
 
@@ -186,7 +174,6 @@ def printPixelMap_v2():
                 for iphi in phibins_neg:
                     maps[(ipt, ieta, iphi, -1)][(layer, subdet)].append(detid)
 
-    import os
     os.system("mkdir -p pixelmap")
     g = open("pixelmap/pLS_map_ElCheapo.txt", "w")
     g_pos = open("pixelmap/pLS_map_pos_ElCheapo.txt", "w")
@@ -219,17 +206,10 @@ def printPixelMap_v2():
                 g_pos.write("{} {} {}\n".format(int(isuperbin), len(all_pos_detids), " ".join([ str(x) for x in all_pos_detids ])))
                 g_neg.write("{} {} {}\n".format(int(isuperbin), len(all_neg_detids), " ".join([ str(x) for x in all_neg_detids ])))
 
-def printPixelMap_v3():
-
+def printPixelMap_v3(centroid, det_geom):
     """
     To print out pixel maps
     """
-
-    import os
-
-    # The text file is a json file with "detid" -> {xyz of 4 corners of the module}
-    centroid = Centroid("data/centroid.txt")
-    det_geom = DetectorGeometry("data/geom.txt", "data/average_radius.txt", "data/average_z.txt")
 
     # Define the binning of "super bins"
     neta = 25.
@@ -354,7 +334,6 @@ def printPixelMap_v3():
                         maps[(ipt, ieta, iphi, iz, -1)][(layer, subdet)].append(detid)
 
     # Writing out the pixel map results
-    import os
     os.system("mkdir -p pixelmap")
 
     # Grand map txt file that will hold everything regardless of the layers
@@ -456,5 +435,29 @@ def printPixelMap_v3():
                     nconns[(ipt, iz, layer, subdet,-1)].Write()
 
 if __name__ == "__main__":
+    # Default file paths
+    default_centroid_file = "data/centroid.txt"
+    default_geom_file = "data/geom.txt"
+    default_average_radius_file = "data/average_r_OT800_IT615.txt"
+    default_average_z_file = "data/average_z_OT800_IT615.txt"
 
-    printPixelMap()
+    # Check for help flag
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print("\nUsage: python compute_connection.py [centroid_file] [geom_file] [average_radius_file] [average_z_file]")
+        print("\nOptions:")
+        print(f"  centroid_file          Path to the centroid file. Default is {default_centroid_file}")
+        print(f"  geom_file              Path to the geometry file. Default is {default_geom_file}")
+        print(f"  average_radius_file    Path to the average radius file. Default is {default_average_radius_file}")
+        print(f"  average_z_file         Path to the average z file. Default is {default_average_z_file}")
+        sys.exit()
+
+    # Determine file paths based on arguments provided
+    centroid_file = sys.argv[1] if len(sys.argv) > 1 else default_centroid_file
+    geom_file = sys.argv[2] if len(sys.argv) > 2 else default_geom_file
+    average_radius_file = sys.argv[3] if len(sys.argv) > 3 else default_average_radius_file
+    average_z_file = sys.argv[4] if len(sys.argv) > 4 else default_average_z_file
+
+    det_geom = DetectorGeometry(geom_file, average_radius_file, average_z_file)
+    centroid = Centroid(centroid_file)
+
+    printPixelMap(centroid, det_geom)
