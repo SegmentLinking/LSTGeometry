@@ -40,7 +40,7 @@ import Module as m
 import math
 import json
 
-centroid = Centroid("data/centroid.txt")
+centroid = Centroid("data/sensor_centroids.txt")
 tiltedorientation = TiltedOrientation("data/tilted_orientation.txt")
 
 module_four_corners_database = {}
@@ -129,5 +129,5 @@ for index, detid in enumerate(centroid.data):
     # push to the list
     module_four_corners_database[detid] = four_corner_coords
 
-g = open("data/geom.txt", "w")
+g = open("data/sensor_corners.txt", "w")
 g.write(json.dumps(module_four_corners_database, indent=4))

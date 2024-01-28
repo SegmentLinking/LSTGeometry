@@ -68,7 +68,7 @@ def parse_module_type(det_id):
     else:
         raise ValueError("Invalid subdet value")
 
-def process_csv(file_path):
+def compute_centroids(file_path):
     """
     Use CSV file containing sensor data (rho, phi, Z, detid) to return sensor centroid coordinates (X, Y, Z).
 
@@ -109,7 +109,7 @@ def process_csv(file_path):
 if __name__ == "__main__":
     # Default file paths
     default_input_path = "data/DetId_sensors_list_OT800_IT615.csv"
-    default_output_path = "data/centroid.txt"
+    default_output_path = "data/sensor_centroids.txt"
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     output_path = sys.argv[2] if len(sys.argv) > 2 else default_output_path
 
     # Process CSV file
-    x, y, z, detid, moduleType = process_csv(input_path)
+    x, y, z, detid, moduleType = compute_centroids(input_path)
 
     # Write the data to the specified output file
     with open(output_path, "w") as output:

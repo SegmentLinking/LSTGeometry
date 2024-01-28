@@ -112,7 +112,7 @@ def transform_sensor_corners(df_row):
     module_x = module_rho * np.cos(phi_rad)
     module_y = module_rho * np.sin(phi_rad)
 
-    # Define the corners of the sensor before rotation
+    # Sensor dimensions used to define corners
     half_width = sensor_width / 2
     half_length = sensor_length / 2
     half_spacing = sensor_spacing / 2
@@ -120,12 +120,13 @@ def transform_sensor_corners(df_row):
     # Make the module sizes consistent with hit-based method.
     # FIXME: Using the real (smaller) sizes specified by CSV file increases
     # fake rate significantly and lowers efficiency between abs(eta) 1 to 2. 
-    half_width = 50.0
-    if half_length > 40:
-        half_length = 50.0
-    else:
-        half_length = 25.0
+    width_extension = 50.0 - half_width
+    length_extension = (50.0 if half_length > 40 else 25.0) - half_length
 
+    half_width += width_extension
+    half_length += length_extension
+
+    # Define the corners of the sensor before rotation
     corners = np.array([
         [-half_spacing, -half_width, -half_length],
         [-half_spacing, -half_width, half_length],
@@ -216,7 +217,7 @@ if __name__ == "__main__":
     # Default file paths for module and sensor information
     default_module_info_path = "data/module_info_OT800_IT615.csv"
     default_sensor_info_path = "data/DetId_sensors_list_OT800_IT615.csv"
-    default_output_path = "data/geom.txt"
+    default_output_path = "data/sensor_corners.txt"
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:

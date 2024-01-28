@@ -4,7 +4,7 @@ import pandas as pd
 
 # Import relevant functions from other scripts
 from compute_corners_csv import transform_sensor_corners, assign_corners_to_sensor
-from compute_centroid_csv import process_csv
+from compute_centroid_csv import compute_centroids
 
 def compute_geometry(module_info_path, sensor_info_path, output_path_corners, output_path_centroid):
     # Read input module/sensor csv files
@@ -18,7 +18,7 @@ def compute_geometry(module_info_path, sensor_info_path, output_path_corners, ou
         json.dump(assigned_corners, f, indent=4)
 
     # Compute centroids and save to file
-    x, y, z, detid, moduleType = process_csv(sensor_info_path)
+    x, y, z, detid, moduleType = compute_centroids(sensor_info_path)
     with open(output_path_centroid, "w") as output:
         for i in range(len(x)):
             output.write(f"{detid[i]},{x[i]},{y[i]},{z[i]},{moduleType[i]}\n")
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     # Default file paths
     default_module_info_path = "data/module_info_OT800_IT615.csv"
     default_sensor_info_path = "data/DetId_sensors_list_OT800_IT615.csv"
-    default_output_path_corners = "data/geom.txt"
-    default_output_path_centroid = "data/centroid.txt"
+    default_output_path_corners = "data/sensor_corners.txt"
+    default_output_path_centroid = "data/sensor_centroids.txt"
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:

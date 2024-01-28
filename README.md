@@ -84,12 +84,12 @@ Usage:
     For custom paths: `python compute_centroid_csv.py [inputfile] [outputfile]`
     Replace `[inputfile]` and `[outputfile]` with your specific file paths.
     Default input: `data/DetId_sensors_list_OT800_IT615.csv`
-    Default output: `data/centroid.txt`
+    Default output: `data/sensor_centroids.txt`
 
 ## Computing the Centroids of the modules
 
 Using the printed hits in the above format in a txt file, point the file path in the `compute_centroid.py` script and run it.
-It will then write an output to `data/centroid.txt`.
+It will then write an output to `data/sensor_centroids.txt`.
 
 ## Computing the endcap/tilted module orientation
 
@@ -111,7 +111,7 @@ Use the script:
 
 This will place output to:
 
-    data/geom.txt
+    data/sensor_corners.txt
 
 ## Computing the module maps between the module to another module in a different layer and with the pixel seeds
 

@@ -20,7 +20,7 @@ for line in tqdm.tqdm(lines):
         hits[detid] = []
     hits[detid].append(hit)
 
-output = open("data/centroid.txt", "w")
+output = open("data/sensor_centroids.txt", "w")
 
 for detid in hits:
 
