@@ -273,10 +273,10 @@ def get_curved_line_connections(ref_detid):
     return list_of_detids_etaphi_layer_tar
 
 def write_straight_line_connections(output="output/module_connection_tracing_straight.txt"):
-    write_connections(docurved=False,output=output)
+    return write_connections(docurved=False,output=output)
 
 def write_curved_line_connections(output="output/module_connection_tracing_curved.txt"):
-    write_connections(docurved=True,output=output)
+    return write_connections(docurved=True,output=output)
 
 def write_connections(docurved=False, output="output/module_connection_tracing.txt"):
     list_of_detids_etaphi_layer_ref = det_geom.getDetIds(
@@ -315,6 +315,34 @@ def write_connections(docurved=False, output="output/module_connection_tracing.t
     for ref_detid in sorted(tqdm(module_map.keys())):
         tar_detids = [str(x) for x in module_map[ref_detid]]
         f.write("{} {} {}\n".format(ref_detid, len(tar_detids), " ".join(tar_detids)))
+    
+    return module_map
+
+def merge_maps(straight, curved, output_path="output/module_connection_tracing_merged.txt"):
+    # Initialize a dictionary to hold the merged connections
+    merged_connections = {}
+
+    # Merge the straight connections
+    for key, values in straight.items():
+        if key not in merged_connections:
+            merged_connections[key] = set()
+        merged_connections[key].update(values)
+
+    # Merge the curved connections
+    for key, values in curved.items():
+        if key not in merged_connections:
+            merged_connections[key] = set()
+        merged_connections[key].update(values)
+
+    # Write the merged connections to the output file
+    with open(output_path, "w") as file:
+        for reference in sorted(merged_connections.keys()):
+            uniquelist = list(merged_connections[reference])
+            nconn = len(uniquelist)
+            targets = [str(x) for x in uniquelist]
+            file.write("{} {} {}\n".format(reference, nconn, " ".join(targets)))
+
+    print(f"Merged map written to {output_path}")
 
 if __name__ == "__main__":
     # Default file paths
@@ -348,5 +376,9 @@ if __name__ == "__main__":
     # Make output folder if it doesn't exist
     os.makedirs(os.path.dirname("output/"), exist_ok=True)
 
-    write_curved_line_connections()
-    write_straight_line_connections()
+    # Generate straight and curved module maps
+    curved_map = write_curved_line_connections()
+    straight_map = write_straight_line_connections()
+
+    # Merge straight and curved module maps into one file
+    merge_maps(straight_map, curved_map)

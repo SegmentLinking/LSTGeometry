@@ -87,9 +87,3 @@ Use the script:
     compute_modulemap.py
 
 This will place the modulemap output to the output/ directory and the pixelmaps to their own pixelmap directory.
-
-## Merging module maps
-
-Use the script:
-
-    merge_module_map.py
