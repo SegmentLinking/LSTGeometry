@@ -1,8 +1,10 @@
-#!/bin/env python
-
 import ROOT as r
 import math
 import sys
+
+import os
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import Module as m
 import tqdm

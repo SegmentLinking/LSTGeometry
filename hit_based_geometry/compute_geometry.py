@@ -1,5 +1,3 @@
-#!/bin/env python
-
 # Script to compute the detector module rectangle plane (the 4 corners) from the centroid data
 
 # Output format
@@ -32,6 +30,11 @@
 #     ...
 #     ...
 # }
+
+import os
+import sys
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Centroid import Centroid
 from TiltedOrientation import TiltedOrientation

@@ -1,5 +1,3 @@
-#!/bin/env python
-
 import ROOT as r
 import json
 import os

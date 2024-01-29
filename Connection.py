@@ -1,5 +1,3 @@
-#!/bin/env python
-
 from tqdm import tqdm
 
 class Connection:
