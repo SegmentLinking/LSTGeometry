@@ -3,7 +3,6 @@
 from tqdm import tqdm
 
 class TiltedOrientation:
-
     def __init__(self, filepath):
         self.filepath = filepath
         self.data = {}

@@ -25,15 +25,15 @@ for line in tqdm.tqdm(lines):
         hits[detid] = []
     hits[detid].append(hit)
 
-output = open("data/endcap_orientation.txt", "w")
+output = open("../output/tilted_orientation.txt", "w")
 
 # Computing two groups of hits
-output.write("# detid average_r2s y_intercept_low_hits slope_low_hits y_intercept_high_hits slope_high_hits\n")
+output.write("# detid drdz xy-slope\n")
 for detid in tqdm.tqdm(hits):
 
     mod = m.Module(int(detid), int(moduleType[detid]))
-    isendcap = mod.subdet() == 4
-    if not isendcap:
+    istilt = (mod.side() == 1 or mod.side() == 2) and mod.subdet() == 5
+    if not istilt:
         continue
     isstrip = mod.moduleLayerType() == 1
     if not isstrip:
@@ -43,31 +43,27 @@ for detid in tqdm.tqdm(hits):
     n = len(hits[detid])
 
     # There are two groups of hits
-    # The average value of r^2's will be used to divide the hits into two groups
 
-    # Trying to group into two hits
-    r2s = []
-
-    # compute r^2 = x^2 + y^2
-    sumr2s = 0
+    azs = []
     for ii, hit in enumerate(hits[detid]):
-        r2 = hit[0]**2 + hit[1]**2
-        r2s.append(r2)
-        sumr2s += r2
-
-    # The average value
-    avgr2s = sumr2s / n
+        azs.append(abs(hit[2]))
+    azs = list(set(azs))
+    azs.sort()
 
     # Loop again and group them into two groups
-    hl = [] # low hits
-    hh = [] # high hits
+    hl = [] # low-z hits
+    hh = [] # high-z hits
+    xls = []
+    xhs = []
     for ii, hit in enumerate(hits[detid]):
-        r2 = hit[0]**2 + hit[1]**2
+        az = abs(hit[2])
         # put them into two buckets
-        if r2 < avgr2s:
+        if az == azs[0]:
             hl.append(hit)
+            xls.append(hit[0])
         else:
             hh.append(hit)
+            xhs.append(hit[0])
 
     # Create two TGraph's for fit
     gl = r.TGraph(len(hl))
@@ -76,51 +72,40 @@ for detid in tqdm.tqdm(hits):
     for ii, hit in enumerate(hl):
         gl.SetPoint(ii, hit[0], hit[1])
 
-    if len(hl) > 1:
+    # if lying 90 degrees in x-y plane the fit will fail with infinite slope
+    # so take care of it as a special case
+
+    if len(list(set(xls))) != 1:
+
         rl = gl.Fit("pol1", "q") # Result of low hits fit
         yl = r.gROOT.FindObject("pol1").GetParameter(0)
         sl = r.gROOT.FindObject("pol1").GetParameter(1)
-    else:
-        rl = -999
-        yl = -999
-        sl = -999
 
-    for ii, hit in enumerate(hh):
-        gh.SetPoint(ii, hit[0], hit[1])
+        for ii, hit in enumerate(hh):
+            gh.SetPoint(ii, hit[0], hit[1])
 
-    if len(hh) > 1:
         rh = gh.Fit("pol1", "q") # Result of high hits fit
         yh = r.gROOT.FindObject("pol1").GetParameter(0)
         sh = r.gROOT.FindObject("pol1").GetParameter(1)
+
+        if abs(sl - sh) > 0.005:
+            print("ERROR")
+
+        if abs(yh-yl)/math.sqrt(sl**2+1) == 0:
+            print("")
+            for h in hl:
+                print(h)
+            print("")
+            for h in hh:
+                print(h)
+            rl = gl.Fit("pol0", "q") # Result of low hits fit
+            yl = r.gROOT.FindObject("pol0").GetParameter(0)
+            print(yl)
+            sys.exit()
+
+        output.write("{} {} {}\n".format(detid, abs(yh-yl)/math.sqrt(sl**2+1)/abs(azs[0]-azs[1]), sl)) #, abs(yh-yl)/math.sqrt(sl**2+1), abs(azs[0] - azs[1])
+
     else:
-        rh = -999
-        yh = -999
-        sh = -999
 
-    # if abs(sl - sh) > 0.5 and (sl != -999 and sh != -999):
-    #     print("ERROR", sl, sh)
-    #     print(hl)
-    #     print(hh)
-
-    #     for i in hl:
-    #         print(i)
-
-    #     print("")
-    #     for i in hh:
-    #         print(i)
-
-    if sl == -999 and sh != -999:
-        sl = sh
-        yl = yh
-        rl = rh
-
-    if sl != -999 and sh == -999:
-        sh = sl
-        yh = yl
-        rh = rl
-
-    # if sl == -999:
-    #     print(detid, avgr2s, yl, sl, yh, sh)
-
-    output.write("{} {} {} {} {} {}\n".format(detid, avgr2s, yl, sl, yh, sh))
+        output.write("{} {} {}\n".format(detid, abs(list(set(xls))[0]-list(set(xhs))[0])/ abs(azs[0] - azs[1]), 123456789)) #, abs(list(set(xls))[0]-list(set(xhs))[0]), abs(azs[0] - azs[1])
 

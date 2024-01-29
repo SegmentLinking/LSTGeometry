@@ -1,9 +1,4 @@
-## Creating geometry related files
-
-Take a PU200 ttbar sample so that we have enough hits to perform some simple fits to gather data on the geometry.
-
-
-## Conda for jupyter notebook
+## Setting up the relevant environment
 
     curl -O -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b 
@@ -38,90 +33,63 @@ The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracke
 Sources for specific files:
 - `allCoordinates.csv` (renamed `module_info.csv`) is available at [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html)
 - `DetId_sensors_list.csv` can be found linked from the homepage of the above URL.
+- The `average_r_OT800_IT615.txt` and `average_z_OT800_IT615.txt` files can be taken directly from the table at the top of the [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html) page. These represent the average r positions of the Barrel layers and the average z positions of the Endcap layers.
 
-## Printing Hits
+## Compute Geometry (CSV)
 
-First step of generating the module maps and pixel maps.
-Saves the hits in the outer tracker container to a file.
-One can use the tracking ntuple from the CMSSW output.
-
-    print_hits.py
-
-    Usage:
-
-    Run the script with the following command:
-
-    python print_hits.py [inputfile] [outputfile] [nevents]
-
-    inputfile: Optional. The path to the ROOT file. If not specified, a default path is used.
-    outputfile: Optional. The path to the output text file. If not specified, defaults to hits.txt.
-    nevents: Optional. The maximum number of events to process. If not specified, defaults to 100.
-
-    The script writes the hit data in the following format:
-
-    x: [x-coordinate] y: [y-coordinate] z: [z-coordinate] detId: [detector ID] moduleType: [module type]
-
-    For example:
-
-    x: 109.938 y: -7.6565 z: 101.17 detId: 443363422 moduleType: 25
-    x: 110.055 y: -6.24833 z: 101.17 detId: 443363422 moduleType: 25
-    x: 109.921 y: -7.86728 z: 106.194 detId: 443363422 moduleType: 25
-    x: 109.656 y: -5.61791 z: 115.163 detId: 443363425 moduleType: 25
-    x: 109.517 y: -7.29516 z: 115.163 detId: 443363425 moduleType: 25
-    x: 109.481 y: -5.54475 z: 115.163 detId: 443363426 moduleType: 25
-    x: 109.342 y: -7.22648 z: 115.163 detId: 443363426 moduleType: 25
-    ...
-
-## Compute Centroids (CSV)
-
-Alternative way of computing the sensor centroids using the CSV files in /data/ directly 
-instead of using the hit information computed in the previous step.
+The `compute_geometry.py` file computes both the sensor corner coordinates and centroid coordinates using the `compute_corners.py` and `compute_centroids.py` files respectively.
 
 Usage:
 
-    Run `python compute_centroid_csv.py` for default file paths.
+    Run `python3 compute_geometry.py` for default file paths.
 
-    For custom paths: `python compute_centroid_csv.py [inputfile] [outputfile]`
+    For custom paths: `python3 compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid]`
+    Replace `[module_info_file]`, `[sensor_info_file]`, `[outputfile_corners]`, and `[outputfile_centroid]` with your specific file paths.
+    Default module info file: `data/module_info_OT800_IT615.csv`
+    Default sensor info file: `data/DetId_sensors_list_OT800_IT615.csv`
+    Default output file for corners: `output/sensor_corners.txt`
+    Default output file for centroids: `output/sensor_centroids.txt`
+
+## Compute Centroids (CSV)
+
+The `compute_centroids.py` file computes the centroid coordinates of each sensor using the CSV files in /data
+
+Usage:
+
+    Run `python3 compute_centroids.py` for default file paths.
+
+    For custom paths: `python3 compute_centroids.py [inputfile] [outputfile]`
     Replace `[inputfile]` and `[outputfile]` with your specific file paths.
     Default input: `data/DetId_sensors_list_OT800_IT615.csv`
-    Default output: `data/sensor_centroids.txt`
+    Default output: `output/sensor_centroids.txt`
 
-## Computing the Centroids of the modules
+## Compute Corners (CSV)
 
-Using the printed hits in the above format in a txt file, point the file path in the `compute_centroid.py` script and run it.
-It will then write an output to `data/sensor_centroids.txt`.
+The `compute_corners.py` file calculates the four corner coordinates of each sensor based on the provided module and sensor CSV files. It uses rotation matrices to account for various rotations of each sensor and outputs the corner coordinates for each sensor.
 
-## Computing the endcap/tilted module orientation
+Usage:
 
-Use the scripts. Change the input path to the correct txt file.
+    Run `python3 compute_corners.py` for default file paths.
 
-    fit_endcap_module_orientations.py
-    fit_tilted_module_orientations.py
+    For custom paths: `python3 compute_corners.py [module_info_file] [sensor_info_file] [outputfile]`
+    Replace `[module_info_file]`, `[sensor_info_file]`, and `[outputfile]` with your specific file paths.
+    Default module info file: `data/module_info_OT800_IT615.csv`
+    Default sensor info file: `data/DetId_sensors_list_OT800_IT615.csv`
+    Default output file: `output/sensor_corners.txt`
 
-They will place output to:
+## Computing the module maps and pixel maps
 
-    data/endcap_orientation.txt
-    data/tilted_orientation.txt
-
-## Computing the module 4 corner bounds
-
-Use the script:
-
-    compute_geometry.py
-
-This will place output to:
-
-    data/sensor_corners.txt
-
-## Computing the module maps between the module to another module in a different layer and with the pixel seeds
+After running the `compute_geometry.py` file (see above) the following can be run.
 
 Use the script:
 
     compute_pixelmap.py
-    compute_connection.py
+    compute_modulemap.py
 
-If one looks at the ```if __name__ == "__main__":``` area of the script, there are two main functions to be called:
+This will place the modulemap output to the output/ directory and the pixelmaps to their own pixelmap directory.
 
-This will place output to:
+## Merging module maps
 
-    data/module_connection_tracing.txt
+Use the script:
+
+    merge_module_map.py

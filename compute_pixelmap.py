@@ -436,8 +436,8 @@ def printPixelMap_v3(centroid, det_geom):
 
 if __name__ == "__main__":
     # Default file paths
-    default_centroid_file = "data/sensor_centroids.txt"
-    default_geom_file = "data/sensor_corners.txt"
+    default_centroid_file = "output/sensor_centroids.txt"
+    default_geom_file = "output/sensor_corners.txt"
     default_average_radius_file = "data/average_r_OT800_IT615.txt"
     default_average_z_file = "data/average_z_OT800_IT615.txt"
 
@@ -459,5 +459,8 @@ if __name__ == "__main__":
 
     det_geom = DetectorGeometry(geom_file, average_radius_file, average_z_file)
     centroid = Centroid(centroid_file)
+
+    # Make output folder if it doesn't exist
+    os.makedirs(os.path.dirname("output/"), exist_ok=True)
 
     printPixelMap(centroid, det_geom)

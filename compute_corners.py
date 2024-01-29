@@ -217,11 +217,11 @@ if __name__ == "__main__":
     # Default file paths for module and sensor information
     default_module_info_path = "data/module_info_OT800_IT615.csv"
     default_sensor_info_path = "data/DetId_sensors_list_OT800_IT615.csv"
-    default_output_path = "data/sensor_corners.txt"
+    default_output_path = "output/sensor_corners.txt"
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:
-        print("\nUsage: python compute_corners_csv.py [module_info_file] [sensor_info_file] [outputfile]")
+        print("\nUsage: python compute_corners.py [module_info_file] [sensor_info_file] [outputfile]")
         print("\nOptions:")
         print(f"  module_info_file  Path to the module information CSV file. Default is {default_module_info_path}")
         print(f"  sensor_info_file  Path to the sensor information CSV file. Default is {default_sensor_info_path}")
@@ -236,6 +236,9 @@ if __name__ == "__main__":
     # Load the data
     module_csv = pd.read_csv(module_info_path)
     sensor_csv = pd.read_csv(sensor_info_path)
+
+    # Make output folder if it doesn't exist
+    os.makedirs(os.path.dirname("output/"), exist_ok=True)
 
     # Apply the function to each row in the dataframe to get transformed corners
     module_csv['Transformed_Corners'] = module_csv.apply(transform_sensor_corners, axis=1)

@@ -36,8 +36,8 @@ for line in tqdm.tqdm(lines):
         hits[detid] = []
     hits[detid].append(hit)
 
-average_radius_output = open("data/average_radius.txt", "w")
-average_z_output = open("data/average_z.txt", "w")
+average_radius_output = open("../output/average_radius.txt", "w")
+average_z_output = open("../output/average_z.txt", "w")
 
 radii_layer_1_barrel = []
 radii_layer_2_barrel = []

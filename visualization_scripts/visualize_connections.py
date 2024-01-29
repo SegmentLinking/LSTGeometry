@@ -18,7 +18,7 @@ import pickle
 centroidDB = Centroid("data/centroid_2020_0428.txt")
 
 # f = open("data/module_connection_2020_0429.txt")
-# f = open("data/module_connection_tracing.txt")
+# f = open("output/module_connection_tracing.txt")
 # f = open("data/module_connection_tracing_2020_0514_ray.txt")
 # f = open("data/module_connection_tracing_2020_0518_helix.txt")
 f = open("data/module_connection_combined_2020_0520_helixray.txt")

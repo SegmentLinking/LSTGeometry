@@ -1,6 +1,6 @@
 #!/bin/env python
 
-import LSTDisplay
+import visualization_scripts.LSTDisplay as LSTDisplay
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection

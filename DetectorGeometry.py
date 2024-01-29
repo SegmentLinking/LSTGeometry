@@ -1,11 +1,7 @@
-#!/bin/env python
-
 import json
 from tqdm import tqdm
 from Module import Module
 import math
-
-ptthresh = 0.8
 
 # #                       # {
 # #       detId           #     "411309061": [
@@ -88,19 +84,6 @@ class DetectorGeometry:
         self.average_radii = [ float(x.strip()) for x in f_avg_radius.readlines() ]
         f_avg_z = open(avg_z)
         self.average_zs = [ float(x.strip()) for x in f_avg_z.readlines() ]
-        # self.average_radii = []
-        # self.average_radii.append(24.726409077007705) # Layer 1 average radius
-        # self.average_radii.append(37.059873804403495) # Layer 2 average radius
-        # self.average_radii.append(52.17677700048082)  # Layer 3 average radius
-        # self.average_radii.append(68.61016946477243)  # Layer 4 average radius
-        # self.average_radii.append(85.91013998484999)  # Layer 5 average radius
-        # self.average_radii.append(110.71009476599565) # Layer 6 average radius
-        # self.average_zs = []
-        # self.average_zs.append(130.93374689440995) # Layer 1 average Z (endcap)
-        # self.average_zs.append(154.74990605590062) # Layer 2 average Z (endcap)
-        # self.average_zs.append(185.1167890070922)  # Layer 3 average Z (endcap)
-        # self.average_zs.append(221.39607712765957) # Layer 4 average Z (endcap)
-        # self.average_zs.append(264.76252304964544) # Layer 5 average Z (endcap)
 
     def getData(self, filt=None):
         if filt:

@@ -8,9 +8,9 @@ connections = {}
 
 # Take file `f` and `g` and combine into `h`
 
-f = open("data/module_connection_tracing_straight.txt")
-g = open("data/module_connection_tracing_curved.txt")
-h = open("data/module_connection_tracing_merged.txt", "w")
+f = open("output/module_connection_tracing_straight.txt")
+g = open("output/module_connection_tracing_curved.txt")
+h = open("output/module_connection_tracing_merged.txt", "w")
 
 lines = f.readlines()
 
@@ -42,6 +42,4 @@ for reference in sorted(tqdm(connections.keys())):
     uniquelist = list(set(connections[reference]))
     nconn = len(uniquelist)
     targets = [ str(x) for x in uniquelist ]
-    # if nconn > 18:
-    #     continue
     h.write("{} {} {}\n".format(reference, nconn, " ".join(targets)))

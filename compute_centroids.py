@@ -109,11 +109,11 @@ def compute_centroids(file_path):
 if __name__ == "__main__":
     # Default file paths
     default_input_path = "data/DetId_sensors_list_OT800_IT615.csv"
-    default_output_path = "data/sensor_centroids.txt"
+    default_output_path = "output/sensor_centroids.txt"
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:
-        print("\nUsage: python compute_centroid_csv.py [inputfile] [outputfile]")
+        print("\nUsage: python compute_centroids.py [inputfile] [outputfile]")
         print("\nOptions:")
         print(f"  inputfile   Path to the input CSV file. Default is {default_input_path}")
         print(f"  outputfile  Path for the output file. Default is {default_output_path}\n")
@@ -125,6 +125,9 @@ if __name__ == "__main__":
 
     # Process CSV file
     x, y, z, detid, moduleType = compute_centroids(input_path)
+
+    # Make output folder if it doesn't exist
+    os.makedirs(os.path.dirname("output/"), exist_ok=True)
 
     # Write the data to the specified output file
     with open(output_path, "w") as output:
