@@ -1,9 +1,6 @@
-#!/bin/env python
-
 from tqdm import tqdm
 
 class Centroid:
-
     def __init__(self, filepath):
         self.filepath = filepath
         self.data = {}

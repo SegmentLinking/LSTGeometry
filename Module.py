@@ -1,4 +1,3 @@
-#!/bin/env python
 from __future__ import print_function
 import ROOT as r
 import sys
@@ -8,7 +7,6 @@ dirpath = os.path.dirname(os.path.abspath(__file__))
 r.gROOT.ProcessLine(".L {}/ModuleDetIdParser.cxx".format(dirpath))
 
 class Module:
-
     def __init__(self, detid, moduleTypeInfo=None):
         self.detid = int(detid)
         self.moduleSDL = r.SDL.Module(self.detid)
@@ -170,7 +168,6 @@ class Module:
 
 
 if __name__ == "__main__":
-
     try:
         module = Module(int(sys.argv[1]))
     except:

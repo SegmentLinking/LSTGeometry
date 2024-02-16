@@ -1,9 +1,6 @@
-#!/bin/env python
-
 from tqdm import tqdm
 
 class Connection:
-
     def __init__(self, filepath):
         self.filepath = filepath
         self.data = {}

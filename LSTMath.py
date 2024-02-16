@@ -1,5 +1,3 @@
-#!/bin/env python
-
 import matplotlib
 matplotlib.use('pdf')
 import matplotlib.pyplot as plt

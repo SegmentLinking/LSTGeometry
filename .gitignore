@@ -5,3 +5,6 @@
 .DS_store
 .ipynb_checkpoints
 data/*.txt
+hit_based_geometry/*.txt
+output/
+pixelmap/

@@ -1,5 +1,3 @@
-#!/bin/env python
-
 import numpy as np
 import os
 
@@ -24,7 +22,7 @@ class LSTDisplay:
 
     def __init__(self, det_geom):
         self.det_geom = det_geom
-        self.centroidDB = Centroid("data/centroid.txt")
+        self.centroidDB = Centroid("output/sensor_centroids.txt")
 
     # def display_detector_xyz(self, ax, color=None):
 
@@ -77,7 +75,7 @@ class LSTDisplay:
 
     def display_centroid_xy(self):
 
-        f = open("data/centroid.txt")
+        f = open("output/sensor_centroids.txt")
         lines = f.readlines()
 
         # figure
@@ -258,7 +256,7 @@ class LSTDisplay:
 
 def getDefaultLSTDisplay():
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
+    det_geom = DetectorGeometry("output/sensor_corners.txt", "data/average_radius.txt", "data/average_z.txt")
     sdlDisplay = LSTDisplay(det_geom)
     list_of_detids = det_geom.getDetIds(lambda x: Module(x[0]).subdet() == 5 and Module(x[0]).side() == 3 and Module(x[0]).module() <= 2)
     list_of_detids.sort()
@@ -300,13 +298,13 @@ def test2():
 def test3():
 
     from Centroid import Centroid
-    centroidDB = Centroid("data/centroid.txt")
+    centroidDB = Centroid("output/sensor_centroids.txt")
 
     # figure
     # fig, ax = plt.subplots(figsize=(5.2,2.*math.pi))
     fig, ax = plt.subplots(figsize=(4. * 2,2.*math.pi))
     dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    det_geom = DetectorGeometry("data/CMSSW_12_2_0_pre2_geom.txt", "data/average_radius.txt", "data/average_z.txt")
+    det_geom = DetectorGeometry("output/sensor_corners.txt", "data/average_radius.txt", "data/average_z.txt")
     sdlDisplay = LSTDisplay(det_geom)
     # list_of_detids_etaphi = det_geom.getDetIds(lambda x: Module(x[0]).subdet() == 5 and Module(x[0]).side() == 3 and Module(x[0]).module() == 7 and Module(x[0]).layer() == 1 and Module(x[0]).isLower() == 1 and Module(x[0]).rod() == 1)
     layer = 1

@@ -1,8 +1,10 @@
-#!/bin/env python
-
 import ROOT as r
 import math
 import sys
+
+import os
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import Module as m
 import tqdm
@@ -25,7 +27,7 @@ for line in tqdm.tqdm(lines):
         hits[detid] = []
     hits[detid].append(hit)
 
-output = open("data/endcap_orientation.txt", "w")
+output = open("../output/endcap_orientation.txt", "w")
 
 # Computing two groups of hits
 output.write("# detid average_r2s y_intercept_low_hits slope_low_hits y_intercept_high_hits slope_high_hits\n")

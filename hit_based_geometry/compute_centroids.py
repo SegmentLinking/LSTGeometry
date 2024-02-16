@@ -1,6 +1,5 @@
-#!/bin/env python
-
 import tqdm
+import os
 
 f = open("./hits.txt")
 lines = f.readlines()
@@ -20,7 +19,10 @@ for line in tqdm.tqdm(lines):
         hits[detid] = []
     hits[detid].append(hit)
 
-output = open("data/centroid.txt", "w")
+# Make output folder if it doesn't exist
+os.makedirs(os.path.dirname("../output/"), exist_ok=True)
+
+output = open("../output/sensor_centroids.txt", "w")
 
 for detid in hits:
 

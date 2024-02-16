@@ -1,5 +1,3 @@
-#!/bin/env python
-
 # Goal is to compute something like the following
 
 # # average values
@@ -16,6 +14,11 @@
 # self.average_zs.append(185.1167890070922)  # Layer 3 average Z (endcap)
 # self.average_zs.append(221.39607712765957) # Layer 4 average Z (endcap)
 # self.average_zs.append(264.76252304964544) # Layer 5 average Z (endcap)
+
+import os
+import sys
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import tqdm
 import math
@@ -36,8 +39,8 @@ for line in tqdm.tqdm(lines):
         hits[detid] = []
     hits[detid].append(hit)
 
-average_radius_output = open("data/average_radius.txt", "w")
-average_z_output = open("data/average_z.txt", "w")
+average_radius_output = open("../output/average_radius.txt", "w")
+average_z_output = open("../output/average_z.txt", "w")
 
 radii_layer_1_barrel = []
 radii_layer_2_barrel = []

@@ -1,133 +1,57 @@
-#!/bin/env python
-
-# Script to compute the detector module rectangle plane (the 4 corners) from the centroid data
-
-# Output format
-# {
-#     "411309061": [
-#         [
-#             -129.13503188311316,   # z coord
-#             27.99223639171157,     # y coord
-#             -0.7045785443457637    # x coord
-#         ],
-#         [
-#             -129.13503188311316,
-#             26.454739008300713,
-#             9.176519663647351
-#         ],
-#         [
-#             -129.13503188311316,
-#             21.514189904304153,
-#             8.407770971941925
-#         ],
-#         [
-#             -129.13503188311316,
-#             23.051687287715012,
-#             -1.4733272360511913
-#         ]
-#     ],
-#     ...
-#     ...
-#     ...
-#     ...
-#     ...
-# }
-
-from Centroid import Centroid
-from TiltedOrientation import TiltedOrientation
-import Module as m
-
-import math
+import os
+import sys
 import json
+import pandas as pd
 
-centroid = Centroid("data/centroid.txt")
-tiltedorientation = TiltedOrientation("data/tilted_orientation.txt")
+# Import relevant functions from other scripts
+from compute_corners import transform_sensor_corners, assign_corners_to_sensor
+from compute_centroids import compute_centroids
 
-module_four_corners_database = {}
+def compute_geometry(module_info_path, sensor_info_path, output_path_corners, output_path_centroid):
+    # Read input module/sensor csv files
+    module_csv = pd.read_csv(module_info_path)
+    sensor_csv = pd.read_csv(sensor_info_path)
 
-for index, detid in enumerate(centroid.data):
+    # Compute corners and save to file
+    module_csv['Transformed_Corners'] = module_csv.apply(transform_sensor_corners, axis=1)
+    assigned_corners = assign_corners_to_sensor(module_csv, sensor_csv)
+    with open(output_path_corners, 'w') as f:
+        json.dump(assigned_corners, f, indent=4)
 
-    x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
+    # Compute centroids and save to file
+    x, y, z, detid, moduleType = compute_centroids(sensor_info_path)
+    with open(output_path_centroid, "w") as output:
+        for i in range(len(x)):
+            output.write(f"{detid[i]},{x[i]},{y[i]},{z[i]},{moduleType[i]}\n")
 
-    module = m.Module(detid, moduleTypeInfo)
+    print(f"\nProcessed files: {module_info_path}, {sensor_info_path}")
+    print(f"Output written to: {output_path_corners}, {output_path_centroid}\n")
 
-    # if module.side() != 1:
-    #     continue
-    # if module.layer() != 1 and module.layer() != 6:
-    #     continue
-    # if module.rod() != 12:
-    #     continue
-    # if module.subdet() == 5:
-    #     continue
-    # if module.layer() != 2:
-    #     continue
-    # if module.module() != 1:
-    #     continue
-    # if module.moduleType() == 1:
-    #     continue
+if __name__ == "__main__":
+    # Default file paths
+    default_module_info_path = "data/module_info_OT800_IT615.csv"
+    default_sensor_info_path = "data/DetId_sensors_list_OT800_IT615.csv"
+    default_output_path_corners = "output/sensor_corners.txt"
+    default_output_path_centroid = "output/sensor_centroids.txt"
 
-    r = math.sqrt(x**2 + y**2)
-    phi = math.atan2(y, x)
-    phi_ = math.atan2(x, -y)
-    is2S = module.moduleType()
-    philen = 5
-    etalen = 5 if is2S else 2.5
+    # Check for help flag
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print("\nUsage: python compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid]")
+        print("\nOptions:")
+        print(f"  module_info_file    Path to the module information CSV file. Default is {default_module_info_path}")
+        print(f"  sensor_info_file    Path to the sensor information CSV file. Default is {default_sensor_info_path}")
+        print(f"  outputfile_corners  Path for the corners output file. Default is {default_output_path_corners}")
+        print(f"  outputfile_centroid Path for the centroid output file. Default is {default_output_path_centroid}\n")
+        sys.exit()
 
-    # Barrel
-    if module.subdet() == 5:
+    # Determine input and output file paths based on arguments provided
+    module_info_path = sys.argv[1] if len(sys.argv) > 1 else default_module_info_path
+    sensor_info_path = sys.argv[2] if len(sys.argv) > 2 else default_sensor_info_path
+    output_path_corners = sys.argv[3] if len(sys.argv) > 3 else default_output_path_corners
+    output_path_centroid = sys.argv[4] if len(sys.argv) > 4 else default_output_path_centroid
 
-        # Either drdz = None or a value
-        drdz = None
-        if module.subdet() == 5 and module.side() != 3: # If it is tilted
-            try:
-                drdz = tiltedorientation.getDrDz(detid)
-            except:
-                drdz = tiltedorientation.getDrDz(module.partnerDetId())
+    # Make output folder if it doesn't exist
+    os.makedirs(os.path.dirname("output/"), exist_ok=True)
 
-        # Compute various variables
-        dz = etalen
-        dr = drdz * dz if drdz else 0
-        norm = math.sqrt(dz**2 + dr**2)
-        dz /= norm
-        dr /= norm
-        dz *= etalen
-        dr *= etalen
-        dx = philen * math.cos(phi_)
-        dy = philen * math.sin(phi_)
-        dxr = dr * math.cos(phi)
-        dyr = dr * math.sin(phi)
-
-        # Change sign of tilt related displacement if other side of the hemisphere
-        if module.side() == 2 and module.subdet() == 5:
-            dxr = -dxr
-            dyr = -dyr
-
-    # Endcap
-    else:
-
-        # Compute various variables
-        dz = 0
-        dr = etalen
-        norm = math.sqrt(dz**2 + dr**2)
-        dz /= norm
-        dr /= norm
-        dz *= etalen
-        dr *= etalen
-        dx = philen * math.cos(phi_)
-        dy = philen * math.sin(phi_)
-        dxr = dr * math.cos(phi)
-        dyr = dr * math.sin(phi)
-
-    # Compute the four corners
-    four_corner_coords = [
-        [ z + dz , x + dx + dxr , y + dy + dyr ],
-        [ z - dz , x + dx - dxr , y + dy - dyr ],
-        [ z - dz , x - dx - dxr , y - dy - dyr ],
-        [ z + dz , x - dx + dxr , y - dy + dyr ],
-    ]
-
-    # push to the list
-    module_four_corners_database[detid] = four_corner_coords
-
-g = open("data/geom.txt", "w")
-g.write(json.dumps(module_four_corners_database, indent=4))
+    # Compute geometry with specified file paths
+    compute_geometry(module_info_path, sensor_info_path, output_path_corners, output_path_centroid)
