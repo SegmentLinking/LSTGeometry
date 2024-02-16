@@ -41,14 +41,14 @@ The `compute_geometry.py` file computes both the sensor corner coordinates and c
 
 Usage:
 
-    Run `python3 compute_geometry.py` for default file paths.
+    Run: python3 compute_geometry.py for default file paths.
 
-    For custom paths: `python3 compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid]`
-    Replace `[module_info_file]`, `[sensor_info_file]`, `[outputfile_corners]`, and `[outputfile_centroid]` with your specific file paths.
-    Default module info file: `data/module_info_OT800_IT615.csv`
-    Default sensor info file: `data/DetId_sensors_list_OT800_IT615.csv`
-    Default output file for corners: `output/sensor_corners.txt`
-    Default output file for centroids: `output/sensor_centroids.txt`
+    For custom paths: python3 compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid]
+    Replace [module_info_file], [sensor_info_file], [outputfile_corners], and [outputfile_centroid] with your specific file paths.
+    Default module info file: data/module_info_OT800_IT615.csv
+    Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
+    Default output file for corners: output/sensor_corners.txt
+    Default output file for centroids: output/sensor_centroids.txt
 
 ## Compute Centroids (CSV)
 
@@ -56,12 +56,12 @@ The `compute_centroids.py` file computes the centroid coordinates of each sensor
 
 Usage:
 
-    Run `python3 compute_centroids.py` for default file paths.
+    Run: python3 compute_centroids.py for default file paths.
 
-    For custom paths: `python3 compute_centroids.py [inputfile] [outputfile]`
-    Replace `[inputfile]` and `[outputfile]` with your specific file paths.
-    Default input: `data/DetId_sensors_list_OT800_IT615.csv`
-    Default output: `output/sensor_centroids.txt`
+    For custom paths: python3 compute_centroids.py [inputfile] [outputfile]
+    Replace [inputfile] and [outputfile] with your specific file paths.
+    Default input: data/DetId_sensors_list_OT800_IT615.csv
+    Default output: output/sensor_centroids.txt
 
 ## Compute Corners (CSV)
 
@@ -69,21 +69,21 @@ The `compute_corners.py` file calculates the four corner coordinates of each sen
 
 Usage:
 
-    Run `python3 compute_corners.py` for default file paths.
+    Run: python3 compute_corners.py for default file paths.
 
-    For custom paths: `python3 compute_corners.py [module_info_file] [sensor_info_file] [outputfile]`
-    Replace `[module_info_file]`, `[sensor_info_file]`, and `[outputfile]` with your specific file paths.
-    Default module info file: `data/module_info_OT800_IT615.csv`
-    Default sensor info file: `data/DetId_sensors_list_OT800_IT615.csv`
-    Default output file: `output/sensor_corners.txt`
+    For custom paths: python3 compute_corners.py [module_info_file] [sensor_info_file] [outputfile]
+    Replace [module_info_file], [sensor_info_file], and [outputfile] with your specific file paths.
+    Default module info file: data/module_info_OT800_IT615.csv
+    Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
+    Default output file: output/sensor_corners.txt
 
 ## Computing the module maps and pixel maps
 
 After running the `compute_geometry.py` file (see above) the following can be run.
 
-Use the script:
+Use the scripts:
 
-    compute_pixelmap.py
-    compute_modulemap.py
+    python3 compute_pixelmap.py
+    python3 compute_modulemap.py
 
 This will place the modulemap output to the output/ directory and the pixelmaps to their own pixelmap directory.
