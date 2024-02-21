@@ -37,18 +37,30 @@ Sources for specific files:
 
 ## Compute Geometry (CSV)
 
-The `compute_geometry.py` file computes both the sensor corner coordinates and centroid coordinates using the `compute_corners.py` and `compute_centroids.py` files respectively.
+The `compute_geometry.py` file computes both the sensor corner coordinates and centroid coordinates, as well as two orientation files used by the segment linking algorithm, using the `compute_corners.py`, `compute_centroids.py`, and `compute_orientation.py` files respectively. This is the only file that you need to run prior to generating the module maps and pixel maps. Documentation for the individual geometry python files it calls are also given below, but do not need to be run in addition to compute_geometry.
 
 Usage:
 
     Run: python3 compute_geometry.py for default file paths.
 
-    For custom paths: python3 compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid]
-    Replace [module_info_file], [sensor_info_file], [outputfile_corners], and [outputfile_centroid] with your specific file paths.
+    For custom paths: python3 compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid] [outputfile_tilted_barrel] [outputfile_endcap]
     Default module info file: data/module_info_OT800_IT615.csv
     Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
     Default output file for corners: output/sensor_corners.txt
     Default output file for centroids: output/sensor_centroids.txt
+    Default output file for tilted barrel orientations: output/tilted_barrel_orientation.txt
+    Default output file for endcap orientations: output/endcap_orientation.txt
+
+## Computing the Module Maps and Pixel Maps
+
+After running the `compute_geometry.py` file (see above) the following can be run.
+
+Use the scripts:
+
+    python3 compute_pixelmap.py
+    python3 compute_modulemap.py
+
+This will place the modulemap output to the output/ directory and the pixelmaps to their own pixelmap directory.
 
 ## Compute Centroids (CSV)
 
@@ -59,7 +71,6 @@ Usage:
     Run: python3 compute_centroids.py for default file paths.
 
     For custom paths: python3 compute_centroids.py [inputfile] [outputfile]
-    Replace [inputfile] and [outputfile] with your specific file paths.
     Default input: data/DetId_sensors_list_OT800_IT615.csv
     Default output: output/sensor_centroids.txt
 
@@ -72,18 +83,19 @@ Usage:
     Run: python3 compute_corners.py for default file paths.
 
     For custom paths: python3 compute_corners.py [module_info_file] [sensor_info_file] [outputfile]
-    Replace [module_info_file], [sensor_info_file], and [outputfile] with your specific file paths.
     Default module info file: data/module_info_OT800_IT615.csv
     Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
     Default output file: output/sensor_corners.txt
 
-## Computing the module maps and pixel maps
+## Compute Orientations (CSV)
 
-After running the `compute_geometry.py` file (see above) the following can be run.
+The `compute_orientation.py` script calculates the orientations (dr/dz and dx/dy slopes) of each relevant sensor based on their corner coordinates. It outputs two files: one for the slopes of tilted barrel sensors and another for the slopes of endcap sensors. Note that only the dxdy slope is given for endcap sensors because dz is always 0 in the current geometry for the endcap sensors.
 
-Use the scripts:
+Usage:
 
-    python3 compute_pixelmap.py
-    python3 compute_modulemap.py
+    Run: python3 compute_orientation.py for default file paths.
 
-This will place the modulemap output to the output/ directory and the pixelmaps to their own pixelmap directory.
+    For custom paths: python3 compute_orientation.py [sensor_corners_file] [output_tilted_barrel_file] [output_endcap_file]
+    Default sensor corners file: output/sensor_corners.txt
+    Default output file for tilted barrel orientations: output/tilted_barrel_orientation.txt
+    Default output file for endcap orientations: output/endcap_orientation.txt
