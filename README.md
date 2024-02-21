@@ -1,29 +1,3 @@
-## Setting up the relevant environment
-
-    curl -O -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash Miniconda3-latest-Linux-x86_64.sh -b 
-    
-    # add conda to the end of ~/.bashrc, so relogin after executing this line
-    ~/miniconda3/bin/conda init
-    
-    # stop conda from activating the base environment on login
-    conda config --set auto_activate_base false
-    conda config --add channels conda-forge
-    
-    conda create --name analysisenv uproot pandas matplotlib jupyter graphviz iminuit scipy shapely root
-    conda activate analysisenv # To be repeated when re-doing this study
-    conda install -c plotly plotly=4.14.3
-    pip install yahist particle graphviz pydot tqdm
-    
-    # Optional steps
-    git clone git@github.com:SegmentLinking/LSTStudy.git
-    cd LSTStudy
-    
-    jupyter notebook --no-browser
-    
-    # remember the port number and do something like the following on your local computer
-    ssh -N -f -L localhost:$port:localhost:$port uaf-$uaf.t2.ucsd.edu
-
 ## Geometry File Information
 
 The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracker version OT800_IT615:
@@ -34,6 +8,32 @@ Sources for specific files:
 - `allCoordinates.csv` (renamed `module_info.csv`) is available at [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html)
 - `DetId_sensors_list.csv` can be found linked from the homepage of the above URL.
 - The `average_r_OT800_IT615.txt` and `average_z_OT800_IT615.txt` files can be taken directly from the table at the top of the [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html) page. These represent the average r positions of the Barrel layers and the average z positions of the Endcap layers.
+
+## Setting up the relevant environment
+
+    # Download and install Miniconda
+    curl -O -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    bash Miniconda3-latest-Linux-x86_64.sh -b 
+    
+    # add conda to the end of ~/.bashrc, so relogin after executing this line
+    ~/miniconda3/bin/conda init
+    
+    # (optional) stop conda from activating the base environment on login
+    conda config --set auto_activate_base false
+
+    # Add conda-forge as a priority channel for package management
+    conda config --add channels conda-forge
+    
+    # Create a new conda environment with necessary packages
+    conda create --name analysisenv uproot pandas matplotlib jupyter graphviz iminuit scipy shapely root
+    conda activate analysisenv
+    conda install -c plotly plotly=4.14.3
+    pip install yahist particle graphviz pydot tqdm
+
+    # Note: After installation, activate your environment with:
+    # conda activate analysisenv
+    # To deactivate, use:
+    # conda deactivate
 
 ## Compute Geometry (CSV)
 
