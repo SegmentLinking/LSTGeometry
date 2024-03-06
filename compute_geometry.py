@@ -42,8 +42,8 @@ def compute_geometry(module_info_path, sensor_info_path, output_path_corners, ou
 
     # Compute barrel and endcap orientations (slopes) and save to files
     barrel_slopes, endcap_slopes = process_corners(assigned_corners)
-    save_slopes_to_file(barrel_slopes, output_path_tilted_barrel)
-    save_slopes_to_file(endcap_slopes, output_path_endcap)
+    save_slopes_to_file(barrel_slopes, output_path_tilted_barrel, sensor_csv)
+    save_slopes_to_file(endcap_slopes, output_path_endcap, sensor_csv)
 
     print(f"\nProcessed files: {module_info_path}, {sensor_info_path}")
     print(f"Output written to: {output_path_corners}, {output_path_centroid}, {output_path_tilted_barrel}, {output_path_endcap}\n")
