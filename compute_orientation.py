@@ -91,6 +91,7 @@ def save_slopes_to_file(slopes, output_path, centroids_df):
             if values['drdz_slope'] != DEFAULT_SLOPE:
                 line = f"{detid} {values['drdz_slope']} {values['dxdy_slope']}\n"
             else:
+                # LST algorithm expects centroid phi appended to orientation info for endcap.
                 centroid_phi = np.radians(centroids_df.loc[centroids_df['DetId/i'] == int(detid), ' phi_deg/D'].values[0])
                 line = f"{detid} {values['dxdy_slope']} {centroid_phi}\n"
             file.write(line)

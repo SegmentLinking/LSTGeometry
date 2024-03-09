@@ -74,6 +74,10 @@ Usage:
     Default input: data/DetId_sensors_list_OT800_IT615.csv
     Default output: output/sensor_centroids.txt
 
+Output Format:
+
+    sensor_centroids.txt - [sensor detid], [x coordinate of centroid (cm)], [y coordinate of centorid (cm)], [z coordinate of centroid (cm)], [moduletype (23 (PSP), 24 (PSS), or 25 (TwoS))]
+
 ## Compute Corners (CSV)
 
 The `compute_corners.py` file calculates the four corner coordinates of each sensor based on the provided module and sensor CSV files. It uses rotation matrices to account for various rotations of each sensor and outputs the corner coordinates for each sensor.
@@ -87,15 +91,25 @@ Usage:
     Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
     Default output file: output/sensor_corners.txt
 
+Output Format:
+
+    sensor_corners.txt - "sensor detid": [Z, X, Y coordinates for each of the sensor's four corners (cm)]
+
 ## Compute Orientations (CSV)
 
-The `compute_orientation.py` script calculates the orientations (dr/dz and dx/dy slopes) of each relevant sensor based on their corner coordinates. It outputs two files: one for the slopes of tilted barrel sensors and another for the slopes of endcap sensors. Note that only the dxdy slope is given for endcap sensors because dz is always 0 in the current geometry for the endcap sensors.
+The `compute_orientation.py` script calculates the orientations (dr/dz and dx/dy slopes) of each relevant sensor based on their corner coordinates. It outputs two files: one for the slopes of tilted barrel sensors and another for the slopes of endcap sensors. Note that only the dxdy slope is given for endcap sensors because dz is always 0 in the current geometry for the endcap sensors. Additionally, for endcap sensors, the centroid phi value also appended to orientation information.
 
 Usage:
 
     Run: python3 compute_orientation.py for default file paths.
 
-    For custom paths: python3 compute_orientation.py [sensor_corners_file] [output_tilted_barrel_file] [output_endcap_file]
+    For custom paths: python3 compute_orientation.py [sensor_corners_file] [centroids_file] [output_tilted_barrel_file] [output_endcap_file]
     Default sensor corners file: output/sensor_corners.txt
+    Default centroids file: data/DetId_sensors_list_OT800_IT615.csv
     Default output file for tilted barrel orientations: output/tilted_barrel_orientation.txt
     Default output file for endcap orientations: output/endcap_orientation.txt
+
+Output Format:
+
+    endcap_orientation.txt - [endcap sensor detid] [dx/dy slope of sensor] [centroid phi value of sensor]
+    tilted_barrel_orientation.txt - [tilted barrel sensor detid] [dr/dz slope of sensor] [dx/dy slope of sensor]
