@@ -2,6 +2,9 @@ import sys
 import numpy as np
 import pandas as pd
 
+# See Constants.py for definitions.
+from Constants import BARREL, ENDCAP, PSP, PSS, TwoS
+
 def extract_bits(value, start, end):
     """
     Extracts a specific range of bits from an integer value.
@@ -38,15 +41,6 @@ def parse_module_type(det_id):
     # Check if the first digit of detId is '3' for inner tracker
     if str(det_id)[0] == '3':
         return -1
-
-    # Define constants for subdetectors
-    BARREL = 5
-    ENDCAP = 4
-
-    # Constants for module types
-    PSP = 23
-    PSS = 24
-    TwoS = 25
 
     # Parse subdet, layer, and ring
     subdet = extract_bits(det_id, 25, 27)

@@ -8,11 +8,8 @@ from Centroid import Centroid
 import math
 from DetectorGeometry import DetectorGeometry
 
-ptthresh = 0.8
-
-k = 0.00299792458
-B = 3.8
-A = k * B / 2.
+# See Constants.py for definitions.
+from Constants import PTTHRESH
 
 def printPixelMap(centroid, det_geom, output_dir="output/pixelmap/"):
     """
@@ -24,7 +21,7 @@ def printPixelMap(centroid, det_geom, output_dir="output/pixelmap/"):
     nphi = 72.
     nz = 25.
     # pt_bounds = [0.9, 2.0, 4.0, 10., 50.]
-    pt_bounds = [ptthresh, 2.0, 10000.]
+    pt_bounds = [PTTHRESH, 2.0, 10000.]
 
     # Grand map object that will hold the mapping of the pixel map
     # maps[(ipt, ieta, iphi, iz)][(layer, subdet)] = [] # for both positive and negative

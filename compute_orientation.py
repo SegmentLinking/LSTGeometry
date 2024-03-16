@@ -7,10 +7,8 @@ import pandas as pd
 import Module as m
 from compute_centroids import parse_module_type
 
-# Constants for Barrel and Endcap subdet type
-BARREL, ENDCAP = 5, 4
-# Default value for slopes if undefined
-DEFAULT_SLOPE = 123456789
+# See Constants.py for definitions.
+from Constants import BARREL, ENDCAP, DEFAULT_SLOPE
 
 def calculate_slope(dx, dy, dz):
     """
@@ -58,7 +56,7 @@ def process_corners(corners):
         moduletype = parse_module_type(int(detid))
         module = m.Module(int(detid), int(moduletype))
 
-        # Distinguishes barrel and endcap
+        # Distinguishes between barrel and endcap sensors below
         subdet = module.subdet()
         # Is the sensor tilted
         tilted = module.side() != 3

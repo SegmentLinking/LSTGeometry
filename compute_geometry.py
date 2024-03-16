@@ -61,12 +61,12 @@ def main():
     if '-h' in sys.argv or '--help' in sys.argv:
         print("\nUsage: python compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid] [outputfile_tilted_barrel] [outputfile_endcap]")
         print("\nOptions:")
-        print(f"  module_info_file        Path to the module information CSV file. Default is {default_module_info_path}")
-        print(f"  sensor_info_file        Path to the sensor information CSV file. Default is {default_sensor_info_path}")
-        print(f"  outputfile_corners      Path for the corners output file. Default is {default_output_path_corners}")
-        print(f"  outputfile_centroid     Path for the centroid output file. Default is {default_output_path_centroid}")
+        print(f"  module_info_file         Path to the module information CSV file. Default is {default_module_info_path}")
+        print(f"  sensor_info_file         Path to the sensor information CSV file. Default is {default_sensor_info_path}")
+        print(f"  outputfile_corners       Path for the corners output file. Default is {default_output_path_corners}")
+        print(f"  outputfile_centroid      Path for the centroid output file. Default is {default_output_path_centroid}")
         print(f"  outputfile_tilted_barrel Path for the tilted barrel orientation output file. Default is {default_output_path_tilted_barrel}")
-        print(f"  outputfile_endcap       Path for the endcap orientation output file. Default is {default_output_path_endcap}\n")
+        print(f"  outputfile_endcap        Path for the endcap orientation output file. Default is {default_output_path_endcap}\n")
         sys.exit()
 
     # Determine input and output file paths based on arguments provided

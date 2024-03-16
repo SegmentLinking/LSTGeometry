@@ -8,6 +8,9 @@ import math
 from scipy import optimize
 from shapely.geometry import Polygon
 
+# See Constants.py for definitions.
+from Constants import k2Rinv1GeVf, B
+
 class Helix:
     def __init__(self, center, radius, phi, lam, charge):
         self.center_ = center
@@ -108,7 +111,7 @@ def construct_helix_from_kinematics(pt, eta, phi, vx, vy, vz, charge):
     print(pt, eta, phi, vx, vy, vz, charge)
 
     # Radius based on pt
-    radius = pt / (2.99792458e-3 * 3.8)
+    radius = pt / (k2Rinv1GeVf * B)
 
     # reference point vector which for sim track is the vertex point
     ref_vec = np.array([vx, vy, vz]) # reference point vector
@@ -132,7 +135,7 @@ def construct_helix_from_points(pt, vx, vy, vz, mx, my, mz, charge):
     in an extra pi/2 to account for these effects'''
     # print(pt,vx,vy,vz,mx,my,mz,charge)
 
-    radius = pt / (2.99792458e-3 * 3.8)
+    radius = pt / (k2Rinv1GeVf * B)
     R = abs(radius) #For geometrical calculations
 
     t = 2 * np.arcsin(np.sqrt( (vx - mx) **2 + (vy - my) **2 )/(2*R))

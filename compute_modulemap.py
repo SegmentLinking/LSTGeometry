@@ -12,7 +12,8 @@ from Module import Module
 from Centroid import Centroid
 import LSTMath as sdlmath
 
-ptthresh = 0.8
+# See Constants.py for definitions.
+from Constants import PTTHRESH
 
 def get_straight_line_connections_parallel(ref_detid, return_dict={}):
     return_dict[ref_detid] = get_straight_line_connections(ref_detid)
@@ -122,10 +123,10 @@ def bounds_after_curved(ref_detid, doR=True):
     ref_layer = Module(ref_detid).layer()
     ref_subdet = Module(ref_detid).subdet()
     for bound in bounds:
-        helix_p10 = sdlmath.construct_helix_from_points(ptthresh, 0, 0,  10, bound[1], bound[2], bound[0], -charge)
-        helix_m10 = sdlmath.construct_helix_from_points(ptthresh, 0, 0, -10, bound[1], bound[2], bound[0], -charge)
-        helix_p10_pos = sdlmath.construct_helix_from_points(ptthresh, 0, 0,  10, bound[1], bound[2], bound[0], charge)
-        helix_m10_pos = sdlmath.construct_helix_from_points(ptthresh, 0, 0, -10, bound[1], bound[2], bound[0], charge)
+        helix_p10 = sdlmath.construct_helix_from_points(PTTHRESH, 0, 0,  10, bound[1], bound[2], bound[0], -charge)
+        helix_m10 = sdlmath.construct_helix_from_points(PTTHRESH, 0, 0, -10, bound[1], bound[2], bound[0], -charge)
+        helix_p10_pos = sdlmath.construct_helix_from_points(PTTHRESH, 0, 0,  10, bound[1], bound[2], bound[0], charge)
+        helix_m10_pos = sdlmath.construct_helix_from_points(PTTHRESH, 0, 0, -10, bound[1], bound[2], bound[0], charge)
         # helix_p10 = sdlmath.construct_helix_from_points(1, 0, 0,   0, bound[1], bound[2], bound[0], -charge)
         # helix_m10 = sdlmath.construct_helix_from_points(1, 0, 0,   0, bound[1], bound[2], bound[0], -charge)
         # helix_p10_pos = sdlmath.construct_helix_from_points(1, 0, 0,   0, bound[1], bound[2], bound[0], charge)
