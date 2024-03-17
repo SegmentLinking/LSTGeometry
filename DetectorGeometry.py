@@ -3,61 +3,8 @@ from tqdm import tqdm
 from Module import Module
 import math
 
-# #                       # {
-# #       detId           #     "411309061": [
-# #       boundary 1      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             27.99223639171157,
-# #          y coord      #             -0.7045785443457637
-# #                       #         ],
-# #       boundary 2      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             26.454739008300713,
-# #          y coord      #             9.176519663647351
-# #                       #         ],
-# #       boundary 3      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             21.514189904304153,
-# #          y coord      #             8.407770971941925
-# #                       #         ],
-# #       boundary 4      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             23.051687287715012,
-# #          y coord      #             -1.4733272360511913
-# #                       #         ]
-# #                       #     ],
-# #                       #     "411309062": [
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             28.00071896416048,
-# #                       #             -0.693051092358993
-# #                       #         ],
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             26.4596055174114,
-# #                       #             9.187483779005468
-# #                       #         ],
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             21.51933808172917,
-# #                       #             8.416927055630929
-# #                       #         ],
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             23.06045152847825,
-# #                       #             -1.4636078157335337
-# #                       #         ]
-# #                       #     ],
-# #                       #     ...
-# #                       #     ...
-# #                       #     ...
-# #                       #     ...
-# #                       #     ...
-# #                       # }
-
-k = 0.00299792458
-B = 3.8
-A = k * B / 2.
+# See Constants.py for definitions.
+from Constants import k2Rinv1GeVf, B
 
 def Phi_mpi_pi(phi):
     while phi >= math.pi: phi -= 2. * math.pi;
@@ -212,6 +159,7 @@ class DetectorGeometry:
         maxr = self.getMaxR(detid)
         minphi = self.getMinPhi(detid)
         maxphi = self.getMaxPhi(detid)
+        A = k2Rinv1GeVf * B / 2.
         pos_q_phi_lo_bound = Phi_mpi_pi(A * minr / ptmax + minphi)
         pos_q_phi_hi_bound = Phi_mpi_pi(A * maxr / ptmin + maxphi)
         neg_q_phi_lo_bound = Phi_mpi_pi(-A * maxr / ptmin + minphi)

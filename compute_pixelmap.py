@@ -8,203 +8,10 @@ from Centroid import Centroid
 import math
 from DetectorGeometry import DetectorGeometry
 
-ptthresh = 0.8
+# See Constants.py for definitions.
+from Constants import PTTHRESH
 
-# #                       # {
-# #       detId           #     "411309061": [
-# #       boundary 1      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             27.99223639171157,
-# #          y coord      #             -0.7045785443457637
-# #                       #         ],
-# #       boundary 2      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             26.454739008300713,
-# #          y coord      #             9.176519663647351
-# #                       #         ],
-# #       boundary 3      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             21.514189904304153,
-# #          y coord      #             8.407770971941925
-# #                       #         ],
-# #       boundary 4      #         [
-# #          z coord      #             -129.13503188311316,
-# #          x coord      #             23.051687287715012,
-# #          y coord      #             -1.4733272360511913
-# #                       #         ]
-# #                       #     ],
-# #                       #     "411309062": [
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             28.00071896416048,
-# #                       #             -0.693051092358993
-# #                       #         ],
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             26.4596055174114,
-# #                       #             9.187483779005468
-# #                       #         ],
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             21.51933808172917,
-# #                       #             8.416927055630929
-# #                       #         ],
-# #                       #         [
-# #                       #             -128.7349884581733,
-# #                       #             23.06045152847825,
-# #                       #             -1.4636078157335337
-# #                       #         ]
-# #                       #     ],
-# #                       #     ...
-# #                       #     ...
-# #                       #     ...
-# #                       #     ...
-# #                       #     ...
-# #                       # }
-
-k = 0.00299792458
-B = 3.8
-A = k * B / 2.
-
-def Phi_mpi_pi(phi):
-    while phi >= math.pi: phi -= 2. * math.pi;
-    while phi < -math.pi: phi += 2. * math.pi;
-    return phi;
-
-def printPixelMap(centroid, det_geom):
-    printPixelMap_v3(centroid, det_geom)
-
-def printPixelMap_v1(centroid, det_geom):
-    super_bins = {}
-
-    neta = 40.
-    nphi = 72.
-
-    isuper_bin = 0
-    pt_bounds = [0.9, 2.0, 4.0, 10., 50.]
-    # pt_bounds = [0.9, 2.0]
-    for ipt in range(len(pt_bounds)-1):
-        pt_lo = pt_bounds[ipt]
-        pt_hi = pt_bounds[ipt+1]
-        for ieta in range(int(neta)):
-            eta_lo = -2.6 + (5.2 / neta) * ieta
-            eta_hi = -2.6 + (5.2 / neta) * (ieta + 1)
-            for iphi in range(int(nphi)):
-                phi_lo = -math.pi + (2*math.pi / nphi) * iphi
-                phi_hi = -math.pi + (2*math.pi / nphi) * (iphi + 1)
-                super_bins[isuper_bin] = (pt_lo, pt_hi, eta_lo, eta_hi, phi_lo, phi_hi)
-                isuper_bin += 1
-    print(len(super_bins))
-
-    maps = {}
-    for layer in [1, 2, 3, 4, 5, 6]:
-        for subdet in [4, 5]:
-            for isuper_bin in super_bins.keys():
-                bounds = super_bins[isuper_bin]
-                maps[isuper_bin] = []
-                for detid in det_geom.getDetIds():
-                    x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
-                    m =  Module(detid, moduleTypeInfo)
-                    if m.layer() == layer and m.isLower() == 1 and m.moduleType() == 0 and m.subdet() == subdet:
-                        if det_geom.isConnected(detid, bounds[2], bounds[3], bounds[4], bounds[5], bounds[0], bounds[1], -30, 30):
-                            maps[isuper_bin].append(detid)
-                print(isuper_bin, layer, subdet, bounds[2], bounds[3], bounds[4], bounds[5], maps[isuper_bin])
-
-def printPixelMap_v2(centroid, det_geom):
-    neta = 40.
-    nphi = 72.
-
-    maps = {}
-    pt_bounds = [0.9, 2.0, 4.0, 10., 50.]
-    for ipt in range(len(pt_bounds)-1):
-        for ieta in range(int(neta)):
-            for iphi in range(int(nphi)):
-                maps[(ipt, ieta, iphi)] = {}
-                maps[(ipt, ieta, iphi, 1)] = {}
-                maps[(ipt, ieta, iphi, -1)] = {}
-                for layer in [1, 2, 3, 4, 5, 6]:
-                    for subdet in [4, 5]:
-                        maps[(ipt, ieta, iphi)][(layer, subdet)] = []
-                        maps[(ipt, ieta, iphi, 1)][(layer, subdet)] = []
-                        maps[(ipt, ieta, iphi, -1)][(layer, subdet)] = []
-
-    for detid in tqdm(det_geom.getDetIds()):
-        x, y, z, moduleTypeInfo = centroid.getCentroid(detid)
-        module = Module(detid, moduleTypeInfo)
-        layer = module.layer()
-        subdet = module.subdet()
-        if module.isLower() != 1 or module.moduleType() != 0:
-            continue
-        # if module.subdet() == 4:
-        #     if module.ring() != 1 and module.ring() != 2:
-                # continue
-        for ipt in range(len(pt_bounds)-1):
-            pt_lo = pt_bounds[ipt]
-            pt_hi = pt_bounds[ipt+1]
-            etamin = det_geom.getCompatibleEtaRange(detid, -30, 30)[0]
-            etamax = det_geom.getCompatibleEtaRange(detid, -30, 30)[1]
-            ietamin = int((etamin + 2.6) / (5.2 / neta))
-            ietamax = int((etamax + 2.6) / (5.2 / neta))
-            prelim_etabins = range(ietamin, ietamax+1)
-            etabins = []
-            for ieta in prelim_etabins:
-                if ieta >= 0 and ieta < neta:
-                    etabins.append(ieta)
-            iphimin_pos = int((det_geom.getCompatiblePhiRange(detid, pt_lo, pt_hi)[0][0] + math.pi) / (2*math.pi / nphi))
-            iphimax_pos = int((det_geom.getCompatiblePhiRange(detid, pt_lo, pt_hi)[0][1] + math.pi) / (2*math.pi / nphi))
-            iphimin_neg = int((det_geom.getCompatiblePhiRange(detid, pt_lo, pt_hi)[1][0] + math.pi) / (2*math.pi / nphi))
-            iphimax_neg = int((det_geom.getCompatiblePhiRange(detid, pt_lo, pt_hi)[1][1] + math.pi) / (2*math.pi / nphi))
-            if iphimin_pos <= iphimax_pos:
-                phibins_pos = range(iphimin_pos, iphimax_pos)
-            else:
-                phibins_pos = range(0, iphimax_pos) + range(iphimin_pos, 72)
-            if iphimin_neg <= iphimax_neg:
-                phibins_neg = range(iphimin_neg, iphimax_neg)
-            else:
-                phibins_neg = range(0, iphimax_neg) + range(iphimin_neg, 72)
-            for ieta in etabins:
-                for iphi in phibins_pos:
-                    maps[(ipt, ieta, iphi)][(layer, subdet)].append(detid)
-                for iphi in phibins_neg:
-                    maps[(ipt, ieta, iphi)][(layer, subdet)].append(detid)
-                for iphi in phibins_pos:
-                    maps[(ipt, ieta, iphi, 1)][(layer, subdet)].append(detid)
-                for iphi in phibins_neg:
-                    maps[(ipt, ieta, iphi, -1)][(layer, subdet)].append(detid)
-
-    os.system("mkdir -p pixelmap")
-    g = open("pixelmap/pLS_map_ElCheapo.txt", "w")
-    g_pos = open("pixelmap/pLS_map_pos_ElCheapo.txt", "w")
-    g_neg = open("pixelmap/pLS_map_neg_ElCheapo.txt", "w")
-    fs = {}
-    for layer in [1, 2, 3, 4, 5, 6]:
-        for subdet in [4, 5]:
-            fs[(layer, subdet)] = open("pixelmap/pLS_map_layer{}_subdet{}.txt".format(layer, subdet), "w")
-            fs[(layer, subdet, 1)] = open("pixelmap/pLS_map_pos_layer{}_subdet{}.txt".format(layer, subdet), "w")
-            fs[(layer, subdet, -1)] = open("pixelmap/pLS_map_neg_layer{}_subdet{}.txt".format(layer, subdet), "w")
-    for ipt in range(len(pt_bounds)-1):
-        for ieta in range(int(neta)):
-            for iphi in range(int(nphi)):
-                isuperbin = (ipt * nphi * neta) + (ieta * nphi) + iphi
-                all_detids = []
-                all_pos_detids = []
-                all_neg_detids = []
-                for layer in [1, 2, 3, 4, 5, 6]:
-                    for subdet in [4, 5]:
-                        maps[(ipt, ieta, iphi)][(layer, subdet)] = list(set(maps[(ipt, ieta, iphi)][(layer, subdet)]))
-                        maps[(ipt, ieta, iphi, 1)][(layer, subdet)] = list(set(maps[(ipt, ieta, iphi, 1)][(layer, subdet)]))
-                        maps[(ipt, ieta, iphi, -1)][(layer, subdet)] = list(set(maps[(ipt, ieta, iphi, -1)][(layer, subdet)]))
-                        fs[(layer, subdet)].write("{} {} {}\n".format(int(isuperbin), len(maps[(ipt, ieta, iphi)][(layer, subdet)]), " ".join([ str(x) for x in maps[(ipt, ieta, iphi)][(layer, subdet)] ])))
-                        fs[(layer, subdet, 1)].write("{} {} {}\n".format(int(isuperbin), len(maps[(ipt, ieta, iphi, 1)][(layer, subdet)]), " ".join([ str(x) for x in maps[(ipt, ieta, iphi, 1)][(layer, subdet)] ])))
-                        fs[(layer, subdet, -1)].write("{} {} {}\n".format(int(isuperbin), len(maps[(ipt, ieta, iphi, -1)][(layer, subdet)]), " ".join([ str(x) for x in maps[(ipt, ieta, iphi, -1)][(layer, subdet)] ])))
-                        all_detids += maps[(ipt, ieta, iphi)][(layer, subdet)]
-                        all_pos_detids += maps[(ipt, ieta, iphi, 1)][(layer, subdet)]
-                        all_neg_detids += maps[(ipt, ieta, iphi, -1)][(layer, subdet)]
-                g.write("{} {} {}\n".format(int(isuperbin), len(all_detids), " ".join([ str(x) for x in all_detids ])))
-                g_pos.write("{} {} {}\n".format(int(isuperbin), len(all_pos_detids), " ".join([ str(x) for x in all_pos_detids ])))
-                g_neg.write("{} {} {}\n".format(int(isuperbin), len(all_neg_detids), " ".join([ str(x) for x in all_neg_detids ])))
-
-def printPixelMap_v3(centroid, det_geom):
+def printPixelMap(centroid, det_geom, output_dir="output/pixelmap/"):
     """
     To print out pixel maps
     """
@@ -214,7 +21,7 @@ def printPixelMap_v3(centroid, det_geom):
     nphi = 72.
     nz = 25.
     # pt_bounds = [0.9, 2.0, 4.0, 10., 50.]
-    pt_bounds = [ptthresh, 2.0, 10000.]
+    pt_bounds = [PTTHRESH, 2.0, 10000.]
 
     # Grand map object that will hold the mapping of the pixel map
     # maps[(ipt, ieta, iphi, iz)][(layer, subdet)] = [] # for both positive and negative
@@ -331,21 +138,18 @@ def printPixelMap_v3(centroid, det_geom):
                     for iphi in phibins_neg:
                         maps[(ipt, ieta, iphi, iz, -1)][(layer, subdet)].append(detid)
 
-    # Writing out the pixel map results
-    os.system("mkdir -p pixelmap")
-
     # Grand map txt file that will hold everything regardless of the layers
-    g = open("pixelmap/pLS_map_ElCheapo.txt", "w")
-    g_pos = open("pixelmap/pLS_map_pos_ElCheapo.txt", "w")
-    g_neg = open("pixelmap/pLS_map_neg_ElCheapo.txt", "w")
+    g = open(output_dir + "pLS_map_ElCheapo.txt", "w")
+    g_pos = open(output_dir + "pLS_map_pos_ElCheapo.txt", "w")
+    g_neg = open(output_dir + "pLS_map_neg_ElCheapo.txt", "w")
 
     # pixel maps split by layers
     fs = {}
     for layer in [1, 2]: #[1, 2, 3, 4, 5, 6]:
         for subdet in [4, 5]:
-            fs[(layer, subdet)] = open("pixelmap/pLS_map_layer{}_subdet{}.txt".format(layer, subdet), "w")
-            fs[(layer, subdet, 1)] = open("pixelmap/pLS_map_pos_layer{}_subdet{}.txt".format(layer, subdet), "w")
-            fs[(layer, subdet, -1)] = open("pixelmap/pLS_map_neg_layer{}_subdet{}.txt".format(layer, subdet), "w")
+            fs[(layer, subdet)] = open(output_dir + "pLS_map_layer{}_subdet{}.txt".format(layer, subdet), "w")
+            fs[(layer, subdet, 1)] = open(output_dir + "pLS_map_pos_layer{}_subdet{}.txt".format(layer, subdet), "w")
+            fs[(layer, subdet, -1)] = open(output_dir + "pLS_map_neg_layer{}_subdet{}.txt".format(layer, subdet), "w")
 
     # Loop over the super bins
     for ipt in range(len(pt_bounds)-1):
@@ -390,7 +194,7 @@ def printPixelMap_v3(centroid, det_geom):
                     g_neg.write("{} {} {}\n".format(int(isuperbin), len(maps[(ipt, ieta, iphi, iz,-1)]["all"]), " ".join([ str(x) for x in maps[(ipt, ieta, iphi, iz,-1)]["all"] ])))
 
     # Declaring histograms for mapping multiplicities
-    ofile = r.TFile("pixelmap/pLS_map.root", "recreate")
+    ofile = r.TFile(output_dir + "pLS_map.root", "recreate")
     nconns = {}
     for ipt in range(len(pt_bounds)-1):
         for iz in range(int(nz)):
@@ -459,6 +263,6 @@ if __name__ == "__main__":
     centroid = Centroid(centroid_file)
 
     # Make output folder if it doesn't exist
-    os.makedirs(os.path.dirname("output/"), exist_ok=True)
+    os.makedirs("output/pixelmap/", exist_ok=True)
 
     printPixelMap(centroid, det_geom)
