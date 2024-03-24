@@ -62,6 +62,12 @@ Use the scripts:
 
 This will place the modulemap output to the output/ directory and the pixelmaps to their own pixelmap directory.
 
+## Convert Outputs to Binary
+
+After creating the module map and pixel map with the above scripts, you can convert the relevant files stored in output/ to a binary format for use in Tracklooper with the following command:
+
+    python3 convert_binary.py
+
 ## Compute Centroids (CSV)
 
 The `compute_centroids.py` file computes the centroid coordinates of each sensor using the CSV files in /data
