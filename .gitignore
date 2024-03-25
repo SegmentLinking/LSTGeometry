@@ -7,4 +7,5 @@
 data/*.txt
 hit_based_geometry/*.txt
 output/
+bin_output/
 pixelmap/
