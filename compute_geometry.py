@@ -8,6 +8,8 @@ from compute_corners import transform_sensor_corners, assign_corners_to_sensor
 from compute_centroids import compute_centroids
 from compute_orientation import process_corners, save_slopes_to_file
 
+from Constants import DEFAULT_MODULE_INFO_FILE, DEFAULT_SENSOR_INFO_FILE
+
 def compute_geometry(module_info_path, sensor_info_path, output_path_corners, output_path_centroid, output_path_tilted_barrel, output_path_endcap):
     """
     Computes the full geometry outputs including corners and centroids, and calculates orientations (slopes) for both barrel and endcap sensors.
@@ -50,8 +52,8 @@ def compute_geometry(module_info_path, sensor_info_path, output_path_corners, ou
 
 def main():
     # Default file paths
-    default_module_info_path = "data/module_info_OT800_IT615.csv"
-    default_sensor_info_path = "data/DetId_sensors_list_OT800_IT615.csv"
+    default_module_info_path = DEFAULT_MODULE_INFO_FILE
+    default_sensor_info_path = DEFAULT_SENSOR_INFO_FILE
     default_output_path_corners = "output/sensor_corners.txt"
     default_output_path_centroid = "output/sensor_centroids.txt"
     default_output_path_tilted_barrel = "output/tilted_barrel_orientation.txt"

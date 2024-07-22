@@ -1,7 +1,10 @@
+import os
 import sys
 import json
 import numpy as np
 import pandas as pd
+
+from Constants import DEFAULT_MODULE_INFO_FILE, DEFAULT_SENSOR_INFO_FILE
 
 def rodrigues_rotation_matrix(axis, theta):
     """
@@ -215,8 +218,8 @@ def assign_corners_to_sensor(module_csv, sensor_csv):
 
 if __name__ == "__main__":
     # Default file paths for module and sensor information
-    default_module_info_path = "data/module_info_OT800_IT615.csv"
-    default_sensor_info_path = "data/DetId_sensors_list_OT800_IT615.csv"
+    default_module_info_path = DEFAULT_MODULE_INFO_FILE
+    default_sensor_info_path = DEFAULT_SENSOR_INFO_FILE
     default_output_path = "output/sensor_corners.txt"
 
     # Check for help flag

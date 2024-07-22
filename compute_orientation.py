@@ -8,7 +8,7 @@ import Module as m
 from compute_centroids import parse_module_type
 
 # See Constants.py for definitions.
-from Constants import BARREL, ENDCAP, DEFAULT_SLOPE
+from Constants import BARREL, ENDCAP, DEFAULT_SLOPE, DEFAULT_SENSOR_INFO_FILE
 
 def calculate_slope(dx, dy, dz):
     """
@@ -97,7 +97,7 @@ def save_slopes_to_file(slopes, output_path, centroids_df):
 if __name__ == "__main__":
     # Default file paths
     default_sensor_corners_file = 'output/sensor_corners.txt'
-    default_centroids_file = "data/DetId_sensors_list_OT800_IT615.csv"
+    default_centroids_file = DEFAULT_SENSOR_INFO_FILE
     output_tilted_barrel_file = 'output/tilted_barrel_orientation.txt'
     output_endcap_file = 'output/endcap_orientation.txt'
 

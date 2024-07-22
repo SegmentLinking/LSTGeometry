@@ -2,7 +2,6 @@ import os
 import sys
 import math
 import multiprocessing
-import pickle
 
 import numpy as np
 from tqdm import tqdm
@@ -13,7 +12,7 @@ from Centroid import Centroid
 import LSTMath as sdlmath
 
 # See Constants.py for definitions.
-from Constants import PTTHRESH
+from Constants import PTTHRESH, DEFAULT_AVERAGE_R_FILE, DEFAULT_AVERAGE_Z_FILE
 
 def get_straight_line_connections_parallel(ref_detid, return_dict={}):
     return_dict[ref_detid] = get_straight_line_connections(ref_detid)
@@ -349,8 +348,8 @@ if __name__ == "__main__":
     # Default file paths
     default_centroid_file = "output/sensor_centroids.txt"
     default_geom_file = "output/sensor_corners.txt"
-    default_average_radius_file = "data/average_r_OT800_IT615.txt"
-    default_average_z_file = "data/average_z_OT800_IT615.txt"
+    default_average_radius_file = DEFAULT_AVERAGE_R_FILE
+    default_average_z_file = DEFAULT_AVERAGE_Z_FILE
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:

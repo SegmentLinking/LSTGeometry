@@ -9,7 +9,7 @@ import math
 from DetectorGeometry import DetectorGeometry
 
 # See Constants.py for definitions.
-from Constants import PTTHRESH
+from Constants import PTTHRESH, DEFAULT_AVERAGE_R_FILE, DEFAULT_AVERAGE_Z_FILE
 
 def printPixelMap(centroid, det_geom, output_dir="output/pixelmap/"):
     """
@@ -240,8 +240,8 @@ if __name__ == "__main__":
     # Default file paths
     default_centroid_file = "output/sensor_centroids.txt"
     default_geom_file = "output/sensor_corners.txt"
-    default_average_radius_file = "data/average_r_OT800_IT615.txt"
-    default_average_z_file = "data/average_z_OT800_IT615.txt"
+    default_average_radius_file = DEFAULT_AVERAGE_R_FILE
+    default_average_z_file = DEFAULT_AVERAGE_Z_FILE
 
     # Check for help flag
     if '-h' in sys.argv or '--help' in sys.argv:

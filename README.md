@@ -1,13 +1,14 @@
 ## Geometry File Information
 
-The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracker version OT800_IT615:
+The csv files are sourced from the [CMS Tracker Layout Repository](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/cmssw-models/index.html). The following are the currently available tracker versions.
 
-- URL: [Tracker Version OT800_IT615](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/info.html)
+- [T24 (OT800_IT615)](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/cmssw-models/YB_OT800_IT615/index.html)
+- [T33 (OT800_IT711)](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/cmssw-models/ZG_OT800_IT711/index.html)
 
 Sources for specific files:
-- `allCoordinates.csv` (renamed `module_info.csv`) is available at [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html)
-- `DetId_sensors_list.csv` can be found linked from the homepage of the above URL.
-- The `average_r_OT800_IT615.txt` and `average_z_OT800_IT615.txt` files can be taken directly from the table at the top of the [OT800_IT615 Layout](https://cms-tklayout.web.cern.ch/cms-tklayout/layouts-work/recent-layouts/OT800_IT615/layout.html) page. These represent the average r positions of the Barrel layers and the average z positions of the Endcap layers.
+- `allCoordinates.csv` (renamed `module_info_<tracker_version>.csv`) is available in the "geometry" tab on the links above, under the "geometry files" section.
+- `DetId_sensors_list.csv` (renamed `DetId_sensors_list_<tracker_version>.csv`) is available in the "info" tab on the links above, under the "summary" section.
+- The `average_r_<tracker_version>.txt` and `average_z_<tracker_version>.txt` files can be taken directly from the table at the top of the "geometry" tab on the links above. These represent the average r positions of the Barrel layers and the average z positions of the Endcap layers.
 
 ## Setting up the relevant environment
 
@@ -44,8 +45,8 @@ Usage:
     Run: python3 compute_geometry.py for default file paths.
 
     For custom paths: python3 compute_geometry.py [module_info_file] [sensor_info_file] [outputfile_corners] [outputfile_centroid] [outputfile_tilted_barrel] [outputfile_endcap]
-    Default module info file: data/module_info_OT800_IT615.csv
-    Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
+    Default module info file: <Defined in Constants.py>
+    Default sensor info file: <Defined in Constants.py>
     Default output file for corners: output/sensor_corners.txt
     Default output file for centroids: output/sensor_centroids.txt
     Default output file for tilted barrel orientations: output/tilted_barrel_orientation.txt
@@ -77,7 +78,7 @@ Usage:
     Run: python3 compute_centroids.py for default file paths.
 
     For custom paths: python3 compute_centroids.py [inputfile] [outputfile]
-    Default input: data/DetId_sensors_list_OT800_IT615.csv
+    Default input: <Defined in Constants.py>
     Default output: output/sensor_centroids.txt
 
 Output Format:
@@ -93,8 +94,8 @@ Usage:
     Run: python3 compute_corners.py for default file paths.
 
     For custom paths: python3 compute_corners.py [module_info_file] [sensor_info_file] [outputfile]
-    Default module info file: data/module_info_OT800_IT615.csv
-    Default sensor info file: data/DetId_sensors_list_OT800_IT615.csv
+    Default module info file: <Defined in Constants.py>
+    Default sensor info file: <Defined in Constants.py>
     Default output file: output/sensor_corners.txt
 
 Output Format:
@@ -111,7 +112,7 @@ Usage:
 
     For custom paths: python3 compute_orientation.py [sensor_corners_file] [centroids_file] [output_tilted_barrel_file] [output_endcap_file]
     Default sensor corners file: output/sensor_corners.txt
-    Default centroids file: data/DetId_sensors_list_OT800_IT615.csv
+    Default centroids file: <Defined in Constants.py>
     Default output file for tilted barrel orientations: output/tilted_barrel_orientation.txt
     Default output file for endcap orientations: output/endcap_orientation.txt
 

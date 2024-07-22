@@ -1,9 +1,10 @@
+import os
 import sys
 import numpy as np
 import pandas as pd
 
 # See Constants.py for definitions.
-from Constants import BARREL, ENDCAP, PSP, PSS, TwoS
+from Constants import BARREL, ENDCAP, PSP, PSS, TwoS, DEFAULT_SENSOR_INFO_FILE
 
 def extract_bits(value, start, end):
     """
@@ -102,7 +103,7 @@ def compute_centroids(file_path):
 
 if __name__ == "__main__":
     # Default file paths
-    default_input_path = "data/DetId_sensors_list_OT800_IT615.csv"
+    default_input_path = DEFAULT_SENSOR_INFO_FILE
     default_output_path = "output/sensor_centroids.txt"
 
     # Check for help flag
