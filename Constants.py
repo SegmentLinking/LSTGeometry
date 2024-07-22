@@ -8,7 +8,7 @@ PSS = 24
 TwoS = 25
 
 # Default value for slopes if undefined (taken from Tracklooper Repo)
-DEFAULT_SLOPE = 123456789
+DEFAULT_SLOPE = float("inf")
 
 # Minimum pT threshold for the module map and pixel map
 PTTHRESH = 0.8
