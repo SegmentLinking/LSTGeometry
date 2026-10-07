@@ -95,9 +95,14 @@ def printPixelMap(centroid, det_geom, output_dir="output/pixelmap/"):
                 etamin -= 0.05
                 etamax += 0.05
 
+                # Disk 2 is only connected beyond |eta| = 2.3, on both sides
                 if layer==2 and subdet==4:
-                    if etamax < 2.3: continue
-                    if etamin < 2.3: etamin = 2.3
+                    if module.side() == 1:
+                        if etamin > -2.3: continue
+                        if etamax > -2.3: etamax = -2.3
+                    else:
+                        if etamax < 2.3: continue
+                        if etamin < 2.3: etamin = 2.3
 
                 # Compute the indices of the compatible eta range
                 ietamin = int((etamin + 2.6) / (5.2 / neta))
