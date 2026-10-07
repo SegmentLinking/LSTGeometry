@@ -82,7 +82,7 @@ def printPixelMap(centroid, det_geom, output_dir="output/pixelmap/"):
                 zmax = -30 + (iz + 1) * (60. / nz)
 
                 zmin -= 0.05
-                zmin += 0.05
+                zmax += 0.05
 
                 # The ptmin, ptmax of consideration
                 pt_lo = pt_bounds[ipt]
