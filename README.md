@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> **This repository is archived and no longer maintained.** Its code was re-implemented as a CMSSW ESProducer in [SegmentLinking/cmssw#203](https://github.com/SegmentLinking/cmssw/pull/203). To generate the geometry files, use the dump config in [`RecoTracker/LSTGeometry/test`](https://github.com/SegmentLinking/cmssw/tree/master/RecoTracker/LSTGeometry/test) from a CMSSW area:
+>
+> ```
+> cmsRun RecoTracker/LSTGeometry/test/dumpLSTGeometry.py --outputDirectory data --ptCut 0.8 --binaryOutput
+> ```
+
 ## Geometry File Information
 
 The files `DetId_sensors_list.csv` and `module_info.csv` are sourced from Tracker version OT800_IT615:
